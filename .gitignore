@@ -1,0 +1,21 @@
+# Node
+node_modules/
+.env
+*.log
+dist/
+.DS_Store
+
+# Prisma
+prisma/*.db
+prisma/*.db-journal
+
+# Vite
+.vite/
+*.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
