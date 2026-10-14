@@ -39,10 +39,11 @@ router.get('/config', (_req, res) => {
 router.get(
   '/stats',
   asyncHandler(async (_req, res) => {
-    const [courses, tutors, enrollments] = await Promise.all([
+    const [courses, tutors, enrollments, openJobs] = await Promise.all([
       prisma.course.count({ where: { status: 'PUBLISHED', active: true } }),
       prisma.tutor.count({ where: { registered: true, suspended: false } }),
       prisma.enrollment.findMany({ select: { priceUnits: true, tutorUnits: true, student: true } }),
+      prisma.job.count({ where: { status: 'OPEN' } }),
     ]);
     const volume = enrollments.reduce((s, e) => s + BigInt(e.priceUnits), 0n);
     const paidToTutors = enrollments.reduce((s, e) => s + BigInt(e.tutorUnits), 0n);
@@ -53,6 +54,7 @@ router.get(
       learners: new Set(enrollments.map((e) => e.student)).size,
       volume: formatUsdc(volume.toString()),
       paidToTutors: formatUsdc(paidToTutors.toString()),
+      openJobs,
     });
   }),
 );

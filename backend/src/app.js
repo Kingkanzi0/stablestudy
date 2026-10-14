@@ -24,11 +24,16 @@ app.use(express.json({ limit: '200kb' }));
 const generalLimiter = rateLimit({ windowMs: 60_000, limit: 300, standardHeaders: 'draft-7', legacyHeaders: false });
 const writeLimiter = rateLimit({ windowMs: 60_000, limit: 30, standardHeaders: 'draft-7', legacyHeaders: false });
 
+const rpcLimiter = rateLimit({ windowMs: 60_000, limit: 600, standardHeaders: 'draft-7', legacyHeaders: false });
+
+// Read-only chain proxy gets its own, higher limit (wallet UIs poll it).
+app.use('/api/rpc', rpcLimiter, require('./routes/rpc'));
 app.use('/api', generalLimiter);
 app.use('/api/auth', writeLimiter, require('./routes/auth'));
 app.use('/api/sync', writeLimiter);
 app.use('/api/courses', require('./routes/courses'));
 app.use('/api/tutors', require('./routes/tutors'));
+app.use('/api/jobs', require('./routes/jobs'));
 app.use('/api', require('./routes/misc'));
 
 app.use(notFound);
