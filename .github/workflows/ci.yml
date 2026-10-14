@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main, skillpay-v2]
+  pull_request:
+
+jobs:
+  contracts:
+    name: Smart contract tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - run: ./setup.sh
+      - run: forge build --sizes
+      - run: forge test -vvv
+      - name: Check the ABI copies are up to date
+        run: |
+          ./export-abi.sh
+          git diff --exit-code ../frontend/src/contracts ../backend/src/contracts
+
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: skillpay
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/skillpay
+      JWT_SECRET: ci-only-secret-not-for-production
+      SKILLPAY_ADDRESS: '0x0000000000000000000000000000000000000001'
+      ARC_NETWORK: testnet
+      INDEXER_ENABLED: 'false'
+      PORT: '5001'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run check
+      - run: npx prisma migrate deploy
+      - name: Start the API and hit the health check
+        run: |
+          node src/index.js &
+          for i in $(seq 1 20); do curl -fsS localhost:5001/api/health && exit 0; sleep 1; done
+          exit 1
+      - name: Smoke-test public endpoints
+        run: |
+          curl -fsS localhost:5001/api/courses | grep -q '"courses"'
+          curl -fsS localhost:5001/api/stats | grep -q '"enrollments"'
+          curl -fsS localhost:5001/api/auth/nonce | grep -q '"nonce"'
+          test "$(curl -s -o /dev/null -w '%{http_code}' localhost:5001/api/tutors/me/dashboard)" = 401
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      VITE_ARC_NETWORK: testnet
+      VITE_SKILLPAY_ADDRESS: '0x0000000000000000000000000000000000000001'
+      VITE_API_URL: https://api.example.com/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run lint
+      - run: npm run build

@@ -1,3 +1,8 @@
+// SkillPay database schema.
+// The blockchain is the source of truth for prices, ownership and enrolments.
+// This database stores off-chain metadata (titles, lessons, profiles) and an
+// index of on-chain events so the app can load quickly.
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,135 +12,97 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User table
-model User {
-  id            String   @id @default(cuid())
-  email         String   @unique
-  password      String?
-  walletAddress String?  @unique
-  username      String   @unique
-  fullName      String
-  bio           String?
-  role          UserRole @default(STUDENT)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  // Relations
-  studentProfile StudentProfile?
-  tutorProfile   TutorProfile?
-  payments       Payment[]
-  reviewsGiven   Review[]        @relation("StudentReviews") // Student wrote this review
-  // reviewsReceived is NOT needed here - it's handled by TutorProfile
-}
-
-enum UserRole {
-  STUDENT
-  TUTOR
-  BOTH
-}
-
-// Student Profile
-model StudentProfile {
-  id                String   @id @default(cuid())
-  userId            String   @unique
-  user              User     @relation(fields: [userId], references: [id])
-  learningGoals     String?
-  skillLevel        String?
-  totalLessonsTaken Int      @default(0)
-  totalSpent        Float    @default(0)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  enrollments Enrollment[]
-}
-
-// Tutor Profile
-model TutorProfile {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  user            User     @relation(fields: [userId], references: [id])
-  title           String?
-  experienceYears Int?
-  hourlyRate      Float    @default(0)
-  subjects        String[] @default([])
-  availability    Json?
-  totalStudents   Int      @default(0)
-  totalEarned     Float    @default(0)
-  rating          Float?   @default(0)
-  totalReviews    Int      @default(0)
-  isVerified      Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+model Tutor {
+  /// Lower-case wallet address
+  address     String   @id
+  displayName String
+  headline    String?
+  bio         String?
+  avatarUrl   String?
+  website     String?
+  /// Mirrors on-chain state, kept up to date by the indexer
+  registered  Boolean  @default(false)
+  suspended   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   courses Course[]
-  reviews Review[] // Reviews received by this tutor
 }
 
-// Course
 model Course {
-  id          String       @id @default(cuid())
-  tutorId     String
-  tutor       TutorProfile @relation(fields: [tutorId], references: [id])
-  title       String
-  description String
-  price       Float
-  subject     String
-  level       String
-  duration    Int?
-  isActive    Boolean      @default(true)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  /// Metadata id. The on-chain metadataURI points at /api/metadata/courses/:id
+  id              String       @id @default(cuid())
+  /// Id assigned by the SkillPay contract once the course is published on-chain
+  onchainId       Int?         @unique
+  tutorAddress    String
+  tutor           Tutor        @relation(fields: [tutorAddress], references: [address])
+  title           String
+  summary         String
+  description     String
+  category        String
+  level           String
+  durationMinutes Int?
+  coverColor      String?
+  /// DRAFT until the CourseCreated event is seen on-chain, then PUBLISHED
+  status          String       @default("DRAFT")
+  /// Price in USDC base units (6 decimals), mirrored from chain
+  priceUnits      String?
+  active          Boolean      @default(false)
+  enrollmentCount Int          @default(0)
+  createdTx       String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 
+  lessons     Lesson[]
   enrollments Enrollment[]
+
+  @@index([tutorAddress])
+  @@index([status, active])
 }
 
-// Enrollment
+model Lesson {
+  id         String  @id @default(cuid())
+  courseId   String
+  course     Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  position   Int
+  title      String
+  /// Markdown/plain text, only served to enrolled students and the tutor
+  content    String
+  videoUrl   String?
+  resourceUrl String?
+
+  @@unique([courseId, position])
+}
+
 model Enrollment {
-  id          String         @id @default(cuid())
-  studentId   String
-  student     StudentProfile @relation(fields: [studentId], references: [id])
-  courseId    String
-  course      Course         @relation(fields: [courseId], references: [id])
-  status      String         @default("PENDING")
-  paymentId   String?
-  amountPaid  Float
-  completedAt DateTime?
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  id           String   @id @default(cuid())
+  courseId     String
+  course       Course   @relation(fields: [courseId], references: [id])
+  onchainId    Int
+  /// Lower-case wallet address
+  student      String
+  txHash       String
+  logIndex     Int
+  blockNumber  Int
+  priceUnits   String
+  feeUnits     String
+  tutorUnits   String
+  createdAt    DateTime @default(now())
 
-  @@unique([studentId, courseId])
+  @@unique([onchainId, student])
+  @@unique([txHash, logIndex])
+  @@index([student])
 }
 
-// Payment
-model Payment {
-  id              String   @id @default(cuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id])
-  type            String
-  amount          Float
-  currency        String   @default("USDC")
-  status          String   @default("PENDING")
-  transactionHash String?
-  description     String?
-  metadata        Json?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@index([userId])
-  @@index([transactionHash])
+model AuthNonce {
+  nonce     String   @id
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
 
-// Review - SIMPLIFIED
-model Review {
-  id        String       @id @default(cuid())
-  studentId String
-  student   User         @relation("StudentReviews", fields: [studentId], references: [id])
-  tutorId   String
-  tutor     TutorProfile @relation(fields: [tutorId], references: [id])
-  rating    Int
-  comment   String?
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-
-  @@unique([studentId, tutorId])
+model IndexerState {
+  id        Int      @id @default(1)
+  lastBlock BigInt
+  updatedAt DateTime @updatedAt
 }
