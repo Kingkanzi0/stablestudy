@@ -55,6 +55,20 @@ function TutorDashboard() {
 
   const profile = dash.data.tutor
   const chainTutor = onchain.data
+  // Prefer live contract state; fall back to the API's indexed copy if the chain read fails.
+  const registered = Boolean(chainTutor?.registered || profile?.registered)
+  const suspended = Boolean(chainTutor?.suspended ?? profile?.suspended)
+  const stats = chainTutor
+    ? {
+        earned: formatUsdc(chainTutor.totalEarned),
+        students: chainTutor.totalStudents,
+        courses: chainTutor.courseCount,
+      }
+    : {
+        earned: dash.data.stats?.totalEarned ?? '0.00',
+        students: dash.data.stats?.totalEnrollments ?? 0,
+        courses: dash.data.courses.filter((c) => c.status === 'PUBLISHED').length,
+      }
 
   if (!profile || editingProfile) {
     return (
@@ -69,8 +83,16 @@ function TutorDashboard() {
     )
   }
 
-  if (!chainTutor?.registered) {
-    return <RegisterStep metadataURI={dash.data.metadataURI} onDone={() => onchain.refetch()} />
+  if (!registered) {
+    return (
+      <RegisterStep
+        metadataURI={dash.data.metadataURI}
+        onDone={() => {
+          onchain.refetch()
+          dash.refetch()
+        }}
+      />
+    )
   }
 
   const { courses, recentSales } = dash.data
@@ -80,7 +102,7 @@ function TutorDashboard() {
         <div>
           <h1>Hi, {profile.displayName}</h1>
           <p>
-            {chainTutor.suspended
+            {suspended
               ? 'Your tutor account is suspended. Contact SkillPay support.'
               : 'Here’s how your courses are doing.'}
           </p>
@@ -97,15 +119,15 @@ function TutorDashboard() {
 
       <section className="dash-stats" aria-label="Your earnings">
         <div className="dash-stat dash-stat-earn">
-          <span className="dash-stat-value">{formatUsdc(chainTutor.totalEarned)} USDC</span>
+          <span className="dash-stat-value">{stats.earned} USDC</span>
           <span className="dash-stat-label">earned, already in your wallet</span>
         </div>
         <div className="dash-stat">
-          <span className="dash-stat-value">{chainTutor.totalStudents}</span>
+          <span className="dash-stat-value">{stats.students}</span>
           <span className="dash-stat-label">enrollments</span>
         </div>
         <div className="dash-stat">
-          <span className="dash-stat-value">{chainTutor.courseCount}</span>
+          <span className="dash-stat-value">{stats.courses}</span>
           <span className="dash-stat-label">courses published</span>
         </div>
       </section>
@@ -238,6 +260,12 @@ function RegisterStep({ metadataURI, onDone }) {
       toast.success('You’re registered as a tutor', { href: explorerTx(hash) })
       onDone()
     } catch (e) {
+      // Already registered (e.g. a second click after the first one succeeded): just move on.
+      if (/AlreadyRegistered/.test(e?.shortMessage || e?.message || '')) {
+        toast.success('You’re already registered as a tutor')
+        onDone()
+        return
+      }
       toast.error('Registration didn’t go through', { body: friendlyError(e) })
     }
   }

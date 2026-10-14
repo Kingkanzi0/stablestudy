@@ -39,6 +39,8 @@ Student wallet ──approve + enroll(courseId)──▶ SkillPay contract
 
 **Tutors**: free registration, course editor with lessons, video and resource links, publish on-chain with a USDC price, change price or hide courses at any time, live earnings dashboard and sales history. Earnings arrive instantly, so there's nothing to withdraw.
 
+**Web3 jobs board**: anyone signed in with a wallet can post roles, contracts and bounties (with USDC pay ranges); learners browse, filter and apply, and each job links to related SkillPay courses.
+
 **Platform**: fee capped at 20% in the contract, pause switch for emergencies, tutor and course moderation, two-step ownership transfer.
 
 ## Repository layout

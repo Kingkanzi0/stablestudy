@@ -51,3 +51,13 @@ export function friendlyError(err) {
   if (/EnforcedPause/.test(msg)) return 'SkillPay is paused for maintenance. Try again soon.'
   return msg.split('\n')[0].slice(0, 200)
 }
+
+/** { payMin: 3000, payMax: 5000, payUnit: 'month' } -> "3,000–5,000 USDC / month" */
+export function formatPay({ payMin, payMax, payUnit } = {}) {
+  const n = (v) => Number(v).toLocaleString('en-US')
+  const unit = payUnit ? ` / ${payUnit}` : ''
+  if (payMin != null && payMax != null && payMin !== payMax) return `${n(payMin)}–${n(payMax)} USDC${unit}`
+  if (payMin != null) return `${payMax != null ? '' : 'From '}${n(payMin)} USDC${unit}`
+  if (payMax != null) return `Up to ${n(payMax)} USDC${unit}`
+  return null
+}

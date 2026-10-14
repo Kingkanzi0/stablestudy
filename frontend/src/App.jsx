@@ -8,6 +8,10 @@ import CoursePlayer from './pages/CoursePlayer'
 import Teach from './pages/Teach'
 import CourseEditor from './pages/CourseEditor'
 import TutorProfile from './pages/TutorProfile'
+import Jobs from './pages/Jobs'
+import JobDetail from './pages/JobDetail'
+import JobEditor from './pages/JobEditor'
+import MyJobs from './pages/MyJobs'
 
 export default function App() {
   return (
@@ -22,6 +26,11 @@ export default function App() {
         <Route path="teach/courses/new" element={<CourseEditor />} />
         <Route path="teach/courses/:id/edit" element={<CourseEditor />} />
         <Route path="tutors/:address" element={<TutorProfile />} />
+        <Route path="jobs" element={<Jobs />} />
+        <Route path="jobs/new" element={<JobEditor />} />
+        <Route path="jobs/mine" element={<MyJobs />} />
+        <Route path="jobs/:id" element={<JobDetail />} />
+        <Route path="jobs/:id/edit" element={<JobEditor />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

@@ -2,11 +2,14 @@ import { Link } from 'react-router-dom'
 import SplitReceipt from '../components/SplitReceipt'
 import { CourseCard, Spinner } from '../components/common'
 import { useApi } from '../hooks/useApi'
+import { JobRow } from './Jobs'
 
 export default function Home() {
   const { data: stats } = useApi('/stats')
   const { data: courseData, isLoading } = useApi('/courses?sort=popular')
   const featured = courseData?.courses?.slice(0, 6) || []
+  const { data: jobData } = useApi('/jobs')
+  const latestJobs = jobData?.jobs?.slice(0, 4) || []
   const hasActivity = stats && stats.enrollments > 0
 
   return (
@@ -68,6 +71,31 @@ export default function Home() {
             <p>No courses are live yet. Publish one in a few minutes and get paid the second a student enrolls.</p>
             <Link to="/teach" className="btn btn-primary">
               Create a course
+            </Link>
+          </div>
+        )}
+      </section>
+
+      <section className="section">
+        <div className="section-head">
+          <h2>Latest Web3 jobs</h2>
+          <Link to="/jobs" className="link-strong">
+            See all jobs
+          </Link>
+        </div>
+        {latestJobs.length ? (
+          <ul className="job-list">
+            {latestJobs.map((j) => (
+              <JobRow key={j.id} job={j} />
+            ))}
+          </ul>
+        ) : (
+          <div className="jobs-cta">
+            <p>
+              <strong>Hiring for a Web3 role?</strong> Post it free and reach people learning on SkillPay.
+            </p>
+            <Link to="/jobs/new" className="btn btn-ghost">
+              Post a job
             </Link>
           </div>
         )}

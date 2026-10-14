@@ -106,3 +106,32 @@ model IndexerState {
   lastBlock BigInt
   updatedAt DateTime @updatedAt
 }
+
+/// Web3 job listings. Off-chain; posted by a signed-in wallet.
+model Job {
+  id            String   @id @default(cuid())
+  /// Lower-case wallet address of whoever posted it
+  posterAddress String
+  title         String
+  company       String
+  companyUrl    String?
+  location      String
+  type          String
+  category      String
+  /// Pay range in whole USDC, optional
+  payMin        Int?
+  payMax        Int?
+  /// "hour" | "month" | "year" | "project"
+  payUnit       String?
+  description   String
+  /// https:// link or mailto: address
+  applyUrl      String
+  tags          String[] @default([])
+  /// OPEN | CLOSED
+  status        String   @default("OPEN")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([status, createdAt])
+  @@index([posterAddress])
+}
