@@ -223,9 +223,11 @@ function AddressLink({ address }) {
 
 function Stages({ status }) {
   if (['CANCELLED', 'REFUNDED'].includes(status)) return null
-  const current = stageIndex(status)
+  // A paid or settled order has finished every stage, so nothing is left "in progress".
+  const finished = ['RELEASED', 'RESOLVED'].includes(status)
+  const current = finished ? STAGES.length : stageIndex(status)
   return (
-    <ol className="stages" aria-label="Order progress">
+    <ol className={`stages${finished ? ' stages-finished' : ''}`} aria-label="Order progress">
       {STAGES.map((s, i) => (
         <li key={s} className={i < current ? 'done' : i === current ? 'current' : ''} aria-current={i === current ? 'step' : undefined}>
           <span className="stage-dot" aria-hidden="true" />
