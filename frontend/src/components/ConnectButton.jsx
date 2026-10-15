@@ -58,10 +58,7 @@ export default function ConnectButton() {
         {open && (
           <div className="menu" role="menu">
             {noWallet ? (
-              <p className="menu-note">
-                No browser wallet found. Install <a href="https://metamask.io/download/" target="_blank" rel="noreferrer">MetaMask</a> or{' '}
-                <a href="https://rabby.io" target="_blank" rel="noreferrer">Rabby</a>, then reload this page.
-              </p>
+              <OpenInWallet />
             ) : (
               wallets.map((c) => (
                 <button key={c.uid} className="menu-item" role="menuitem" onClick={() => connect(c)}>
@@ -121,5 +118,36 @@ export default function ConnectButton() {
         </div>
       )}
     </div>
+  )
+}
+
+/**
+ * Phones have no wallet extension, so offer to reopen this page inside a wallet app's own browser,
+ * where the wallet is available to the site.
+ */
+function OpenInWallet() {
+  const url = typeof window !== 'undefined' ? window.location.href : ''
+  const isPhone = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+  if (!isPhone) {
+    return (
+      <p className="menu-note">
+        No browser wallet found. Install <a href="https://www.okx.com/web3" target="_blank" rel="noreferrer">OKX Wallet</a>,{' '}
+        <a href="https://metamask.io/download/" target="_blank" rel="noreferrer">MetaMask</a> or{' '}
+        <a href="https://rabby.io" target="_blank" rel="noreferrer">Rabby</a>, then reload this page.
+      </p>
+    )
+  }
+  const okx = `https://www.okx.com/download?deeplink=${encodeURIComponent(`okx://wallet/dapp/url?dappUrl=${encodeURIComponent(url)}`)}`
+  const metamask = `https://metamask.app.link/dapp/${url.replace(/^https?:\/\//, '')}`
+  return (
+    <>
+      <p className="menu-note">On a phone, open iSabi inside your wallet app:</p>
+      <a className="menu-item" href={okx}>
+        <span className="wallet-dot" /> Open in OKX Wallet
+      </a>
+      <a className="menu-item" href={metamask}>
+        <span className="wallet-dot" /> Open in MetaMask
+      </a>
+    </>
   )
 }

@@ -46,7 +46,7 @@ export default function TutorProfile() {
             <dd>{stats.uniqueStudents}</dd>
           </div>
           <div>
-            <dt>Earned on SkillPay</dt>
+            <dt>Earned on iSabi</dt>
             <dd>{stats.totalEarned} USDC</dd>
           </div>
         </dl>

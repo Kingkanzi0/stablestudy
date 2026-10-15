@@ -1,18 +1,20 @@
-# SkillPay
+# iSabi
 
-**Learn from anyone. Pay them in seconds.**
+**Learn it. Do it. Get paid in USDC.**
 
-SkillPay is a tutoring marketplace on [Arc](https://arc.io), Circle's stablecoin-native Layer 1. Students pay for courses in USDC; the payment is split inside one transaction (90% to the tutor, 10% platform fee) and settles with deterministic finality in under a second. SkillPay never holds user funds.
+*“Sabi” is Nigerian Pidgin for “to know” or “to be skilled at”. iSabi is where you learn a skill, prove it and get paid for it.*
 
-> Previously **StableStudy**. v2 replaces the mock payment flow with a real, tested smart contract, wallet sign-in, on-chain verification and a redesigned app.
+iSabi is a tutoring marketplace on [Arc](https://arc.io), Circle's stablecoin-native Layer 1. Students pay for courses in USDC; the payment is split inside one transaction (90% to the tutor, 10% platform fee) and settles with deterministic finality in under a second. iSabi never holds user funds.
 
-Live demo: https://stablestudy.vercel.app (will move to the SkillPay domain)
+> Previously **StableStudy**, then **SkillPay**. v2 replaced the mock payment flow with a real, tested smart contract, wallet sign-in, on-chain verification and a redesigned app.
+
+Live demo (Arc Testnet): https://isabi.vercel.app
 
 ---
 
 ## Why Arc
 
-| Arc feature | How SkillPay uses it |
+| Arc feature | How iSabi uses it |
 | --- | --- |
 | USDC as gas | Students and tutors only ever hold one currency. No ETH needed. |
 | Sub-second deterministic finality | Lessons unlock the moment a payment lands. No “waiting for confirmations”. |
@@ -22,7 +24,7 @@ Live demo: https://stablestudy.vercel.app (will move to the SkillPay domain)
 ## How it works
 
 ```
-Student wallet ──approve + enroll(courseId)──▶ SkillPay contract
+Student wallet ──approve + enroll(courseId)──▶ iSabi contract
                                                  │  (same transaction)
                                                  ├──▶ 90% USDC → tutor wallet
                                                  └──▶ 10% USDC → treasury
@@ -39,9 +41,9 @@ Student wallet ──approve + enroll(courseId)──▶ SkillPay contract
 
 **Tutors**: free registration, course editor with lessons, video and resource links, publish on-chain with a USDC price, change price or hide courses at any time, live earnings dashboard and sales history. Earnings arrive instantly, so there's nothing to withdraw.
 
-**Escrow for services, checked by an AI agent**: a client locks USDC for a job with written acceptance criteria; the provider delivers a link; SkillPay's verifier agent (an Arc Agent Stack wallet + Claude) checks each criterion, writes a report and signs release or reject on-chain. The client can approve directly, missed deadlines refund the client, unreviewed deliveries can be claimed, and disputes go to a human arbiter. See [agent/README.md](agent/README.md).
+**Escrow for services, checked by an AI agent**: a client locks USDC for a job with written acceptance criteria; the provider delivers a link; iSabi's verifier agent (an Arc Agent Stack wallet + Claude) checks each criterion, writes a report and signs release or reject on-chain. The client can approve directly, missed deadlines refund the client, unreviewed deliveries can be claimed, and disputes go to a human arbiter. See [agent/README.md](agent/README.md).
 
-**Web3 jobs board**: anyone signed in with a wallet can post roles, contracts and bounties (with USDC pay ranges); learners browse, filter and apply, and each job links to related SkillPay courses.
+**Web3 jobs board**: anyone signed in with a wallet can post roles, contracts and bounties (with USDC pay ranges); learners browse, filter and apply, and each job links to related iSabi courses.
 
 **Platform**: fee capped at 20% in the contract, pause switch for emergencies, tutor and course moderation, two-step ownership transfer.
 
@@ -65,7 +67,7 @@ cd contracts
 ./setup.sh
 forge test
 
-# 2. Local chain with a mock USDC and the SkillPay contract
+# 2. Local chain with a mock USDC and the iSabi contract
 anvil                                   # in its own terminal
 export PK=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80   # anvil test key, never use for real funds
 forge create test/mocks/MockUSDC.sol:MockUSDC --rpc-url http://127.0.0.1:8545 --private-key $PK --broadcast

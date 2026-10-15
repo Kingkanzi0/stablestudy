@@ -1,7 +1,7 @@
 {
-  "name": "skillpay-backend",
+  "name": "isabi-backend",
   "version": "2.0.0",
-  "description": "SkillPay API: course metadata, wallet sign-in and an on-chain event indexer for the SkillPay contract on Arc.",
+  "description": "iSabi API: course metadata, wallet sign-in and an on-chain event indexer for the iSabi contract on Arc.",
   "main": "src/index.js",
   "private": true,
   "engines": {

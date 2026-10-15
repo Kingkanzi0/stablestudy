@@ -84,7 +84,7 @@ async function onOrderCreated(args, log) {
         clientAddress: lower(args.client),
         providerAddress: lower(args.provider),
         title: `Order #${args.orderId}`,
-        description: 'Created directly on-chain. The spec was not shared with SkillPay.',
+        description: 'Created directly on-chain. The spec was not shared with iSabi.',
         criteria: [],
         category: 'Other',
         amountUnits: args.amount.toString(),

@@ -32,7 +32,7 @@ async function fetchText(url, fetchImpl) {
   const res = await fetchImpl(url, {
     redirect: 'follow',
     signal: AbortSignal.timeout(TIMEOUT_MS),
-    headers: { 'User-Agent': 'SkillPay-Verifier-Agent/1.0 (+https://skillpay-arc.vercel.app)' },
+    headers: { 'User-Agent': 'iSabi-Verifier-Agent/1.0' },
   })
   const type = res.headers.get('content-type') || ''
   if (!res.ok) return { ok: false, status: res.status, contentType: type, text: '' }

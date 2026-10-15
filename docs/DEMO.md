@@ -1,6 +1,6 @@
-# SkillPay demo script (Arc House builders check-in)
+# iSabi demo script (Arc House builders check-in)
 
-About 4 minutes. Have two browser profiles ready: **Tutor** and **Student**, both with test USDC on Arc Testnet, and the SkillPay contract open on Arcscan in a third tab.
+About 4 minutes. Have two browser profiles ready: **Tutor** and **Student**, both with test USDC on Arc Testnet, and the iSabi contract open on Arcscan in a third tab.
 
 ## 1. The problem (30 s)
 
@@ -8,7 +8,7 @@ Freelance tutors teaching across borders lose days and a big cut to payouts: pla
 
 ## 2. The idea (20 s)
 
-SkillPay is a tutoring marketplace on Arc. Students pay in USDC, the tutor gets 90% in the same transaction, and it's final in under a second. SkillPay never holds the money.
+iSabi is a tutoring marketplace on Arc. Students pay in USDC, the tutor gets 90% in the same transaction, and it's final in under a second. iSabi never holds the money.
 
 ## 3. Live: tutor publishes a course (60 s)
 

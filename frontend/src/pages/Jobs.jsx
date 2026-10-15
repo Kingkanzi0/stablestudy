@@ -103,7 +103,7 @@ export default function Jobs() {
             </Link>
           }
         >
-          Hiring for a Web3 role? Post it free and reach learners and tutors on SkillPay.
+          Hiring for a Web3 role? Post it free and reach learners and tutors on iSabi.
         </EmptyState>
       ) : (
         <ul className="job-list">

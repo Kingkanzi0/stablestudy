@@ -24,7 +24,7 @@ export function AuthProvider({ children }) {
       const message = createSiweMessage({
         domain: window.location.host,
         address,
-        statement: 'Sign in to SkillPay. This is free and does not send a transaction.',
+        statement: 'Sign in to iSabi. This is free and does not send a transaction.',
         uri: window.location.origin,
         version: '1',
         chainId: network.chain.id,

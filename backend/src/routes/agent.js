@@ -110,7 +110,7 @@ router.post(
     if (input.approved && !allMet) throw new HttpError(400, 'Cannot approve while a criterion is unmet');
 
     const { json, hash } = hashRecord({
-      app: 'SkillPay',
+      app: 'iSabi',
       version: 1,
       order: order.specHash,
       delivery: delivery.deliveryHash,

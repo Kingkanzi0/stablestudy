@@ -430,7 +430,7 @@ function ActionPanel({ view, deliveries, onDone }) {
       </button>,
     )
   }
-  if (s === 'DISPUTED') message = 'A SkillPay arbiter will review both sides and split the payment fairly. Funds stay locked until then.'
+  if (s === 'DISPUTED') message = 'A iSabi arbiter will review both sides and split the payment fairly. Funds stay locked until then.'
   if (s === 'RELEASED') message = 'Done. The provider has been paid.'
   if (s === 'REFUNDED' || s === 'CANCELLED') message = 'This order is closed and the client has been refunded.'
   if (s === 'RESOLVED') message = 'The arbiter settled this order.'
@@ -462,7 +462,7 @@ function ActionPanel({ view, deliveries, onDone }) {
           {confirmDispute ? (
             <>
               <p className="muted small">
-                A dispute stops the escrow until a SkillPay arbiter decides how to split the payment. No more revisions or
+                A dispute stops the escrow until a iSabi arbiter decides how to split the payment. No more revisions or
                 approvals can happen in the meantime. Only do this if you can’t agree.
               </p>
               <div className="action-buttons">
