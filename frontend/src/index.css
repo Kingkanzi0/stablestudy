@@ -2102,3 +2102,23 @@ textarea:focus {
     margin-left: 0;
   }
 }
+
+.dispute-zone {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.link-button {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  opacity: 0.75;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  font: inherit;
+}
+.link-button:hover:not(:disabled) {
+  opacity: 1;
+}
