@@ -41,7 +41,7 @@ function actor(pk) {
       const message = createSiweMessage({
         domain: 'localhost:5173',
         address: account.address,
-        statement: 'Sign in to SkillPay.',
+        statement: 'Sign in to iSabi.',
         uri: 'http://localhost:5173',
         version: '1',
         chainId: chain.id,

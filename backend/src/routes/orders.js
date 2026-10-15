@@ -185,7 +185,7 @@ router.post(
 
     const deadline = new Date(Math.floor(deadlineMs / 1000) * 1000);
     const spec = {
-      app: 'SkillPay',
+      app: 'iSabi',
       version: 1,
       escrow: escrowAddress,
       client: req.wallet,
@@ -246,7 +246,7 @@ router.post(
     if (order.deadline < new Date()) throw new HttpError(400, 'The delivery deadline has passed');
     const input = deliveryInput.parse(req.body);
     const { json, hash } = hashRecord({
-      app: 'SkillPay',
+      app: 'iSabi',
       version: 1,
       order: order.specHash,
       provider: req.wallet,

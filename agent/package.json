@@ -1,7 +1,7 @@
 {
-  "name": "skillpay-verifier-agent",
+  "name": "isabi-verifier-agent",
   "version": "1.0.0",
-  "description": "SkillPay verifier agent: reviews escrow deliveries against their spec with Claude and signs the decision on Arc from a Circle agent wallet.",
+  "description": "iSabi verifier agent: reviews escrow deliveries against their spec with Claude and signs the decision on Arc from a Circle agent wallet.",
   "private": true,
   "type": "module",
   "engines": {

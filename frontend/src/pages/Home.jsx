@@ -18,8 +18,8 @@ export default function Home() {
         <div className="hero-copy">
           <h1>Learn from anyone. Pay them in seconds.</h1>
           <p className="hero-lede">
-            SkillPay is a tutoring marketplace on Arc. You pay in USDC, the tutor keeps 90%, and the money lands in their
-            wallet the moment you enroll. No invoices, no bank transfers, no waiting.
+            iSabi is where you learn a skill, find work and get paid, all in USDC on Arc. Tutors keep 90% the moment you
+            enroll, and paid jobs sit in escrow until an AI agent checks the work.
           </p>
           <div className="hero-actions">
             <Link to="/courses" className="btn btn-primary btn-lg">
@@ -33,7 +33,7 @@ export default function Home() {
         <SplitReceipt />
       </section>
 
-      <section className="facts" aria-label="SkillPay in numbers">
+      <section className="facts" aria-label="iSabi in numbers">
         {hasActivity ? (
           <>
             <Fact value={`${stats.paidToTutors} USDC`} label="paid to tutors" />
@@ -45,7 +45,7 @@ export default function Home() {
           <>
             <Fact value="90%" label="of every payment goes to the tutor" />
             <Fact value="< 1 s" label="to settle on Arc, with no confirmations to wait for" />
-            <Fact value="0" label="funds held by SkillPay. Payments go wallet to wallet" />
+            <Fact value="0" label="funds held by iSabi. Money moves through open contracts" />
           </>
         )}
       </section>
@@ -67,7 +67,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="first-course">
-            <h3>Be the first tutor on SkillPay</h3>
+            <h3>Be the first tutor on iSabi</h3>
             <p>No courses are live yet. Publish one in a few minutes and get paid the second a student enrolls.</p>
             <Link to="/teach" className="btn btn-primary">
               Create a course
@@ -80,7 +80,7 @@ export default function Home() {
         <div>
           <h2>Hire anyone. Pay only for work that meets the brief.</h2>
           <p>
-            Lock USDC in escrow, list what “done” means, and SkillPay’s verifier agent on Arc checks the delivery against
+            Lock USDC in escrow, list what “done” means, and iSabi’s verifier agent on Arc checks the delivery against
             each point before the money moves. You can always approve it yourself, and missed deadlines refund you.
           </p>
         </div>
@@ -105,7 +105,7 @@ export default function Home() {
         ) : (
           <div className="jobs-cta">
             <p>
-              <strong>Hiring for a Web3 role?</strong> Post it free and reach people learning on SkillPay.
+              <strong>Hiring for a Web3 role?</strong> Post it free and reach people learning on iSabi.
             </p>
             <Link to="/jobs/new" className="btn btn-ghost">
               Post a job

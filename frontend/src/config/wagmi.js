@@ -2,7 +2,7 @@ import { createConfig, fallback, http } from 'wagmi'
 import { injected } from 'wagmi/connectors'
 import { network } from './network'
 
-// Chain reads go through the SkillPay API first (works even when a browser or
+// Chain reads go through the iSabi API first (works even when a browser or
 // privacy shield blocks public RPC endpoints), then fall back to Arc's RPC directly.
 // Transactions are always signed and sent by the user's wallet, not these transports.
 const transport = fallback([

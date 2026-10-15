@@ -42,7 +42,7 @@ export async function api(path, { method = 'GET', body, token } = {}) {
       body: body ? JSON.stringify(body) : undefined,
     })
   } catch {
-    throw new ApiError(0, 'Can’t reach the SkillPay server. Check your connection and try again.')
+    throw new ApiError(0, 'Can’t reach the iSabi server. Check your connection and try again.')
   }
   if (res.status === 204) return null
   const data = await res.json().catch(() => ({}))

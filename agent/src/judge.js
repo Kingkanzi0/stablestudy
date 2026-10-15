@@ -4,7 +4,7 @@
  * Approval always requires every criterion to be met; that rule is enforced here, not left to the model.
  */
 
-export const SYSTEM_PROMPT = `You are the SkillPay verifier agent. A client locked USDC in an escrow on Arc for a piece of work.
+export const SYSTEM_PROMPT = `You are the iSabi verifier agent. A client locked USDC in an escrow on Arc for a piece of work.
 Your job is to decide whether the provider's delivery meets every acceptance criterion in the agreed spec.
 
 Rules:

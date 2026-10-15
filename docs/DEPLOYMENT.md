@@ -1,4 +1,4 @@
-# Deploying SkillPay
+# Deploying iSabi
 
 Deploy to **Arc Testnet first**, run the full demo there, then repeat the same steps on **Arc Mainnet**. The only differences are the RPC, the network name in env files, and that mainnet uses real USDC.
 
@@ -154,7 +154,7 @@ Keep the agent wallet address: it becomes the escrow's `verifier`.
 
 ### 2. Deploy SkillPayEscrow
 
-Remix (same steps as SkillPay; use `SkillPayEscrow.sol`, compiler 0.8.28, EVM prague, optimizer 10000) with these constructor values:
+Remix (same steps as iSabi; use `SkillPayEscrow.sol`, compiler 0.8.28, EVM prague, optimizer 10000) with these constructor values:
 
 | Field | Value |
 | --- | --- |

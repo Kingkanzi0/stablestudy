@@ -28,7 +28,7 @@ export default function SplitReceipt() {
   const fee = ex.price * 0.1
 
   return (
-    <figure className={`receipt phase-${phase}`} aria-label={`Example: a ${fmt(ex.price)} USDC payment splits ${fmt(tutorCut)} to the tutor and ${fmt(fee)} to SkillPay, settled on Arc`}>
+    <figure className={`receipt phase-${phase}`} aria-label={`Example: a ${fmt(ex.price)} USDC payment splits ${fmt(tutorCut)} to the tutor and ${fmt(fee)} to iSabi, settled on Arc`}>
       <div className="receipt-head">
         <span>Enrollment</span>
         <span className="receipt-chain">Arc</span>
@@ -52,7 +52,7 @@ export default function SplitReceipt() {
         </div>
         <div>
           <dt>
-            <i className="swatch swatch-fee" /> SkillPay fee
+            <i className="swatch swatch-fee" /> iSabi fee
           </dt>
           <dd>{fmt(fee)}</dd>
         </div>

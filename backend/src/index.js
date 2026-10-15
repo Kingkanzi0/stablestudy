@@ -4,7 +4,7 @@ const { prisma } = require('./db');
 const { startIndexer, stopIndexer } = require('./services/indexer');
 
 const server = app.listen(env.PORT, () => {
-  console.log(`SkillPay API listening on http://localhost:${env.PORT}`);
+  console.log(`iSabi API listening on http://localhost:${env.PORT}`);
   console.log(`Network: ${network.name} (chain ${network.id})`);
   console.log(`Contract: ${contractAddress}`);
   startIndexer();

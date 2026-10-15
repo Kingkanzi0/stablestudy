@@ -72,7 +72,7 @@ export default function JobDetail() {
             ) : (
               shortAddress(j.poster)
             )}
-            . SkillPay doesn’t verify employers, so never pay to apply.
+            . iSabi doesn’t verify employers, so never pay to apply.
           </p>
         </article>
 
@@ -91,7 +91,7 @@ export default function JobDetail() {
           )}
           <div className="job-learn">
             <strong>Build the skills for this role</strong>
-            <p>Find courses on SkillPay taught by people already doing this work.</p>
+            <p>Find courses on iSabi taught by people already doing this work.</p>
             <Link to={`/courses?q=${learnQuery}`} className="link-strong">
               Browse related courses
             </Link>

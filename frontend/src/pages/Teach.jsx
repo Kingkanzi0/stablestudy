@@ -32,7 +32,7 @@ function TeachPitch() {
       <h1>Teach what you know. Get paid the second someone enrolls.</h1>
       <p>
         Publish a course, set your price in USDC, and keep 90% of every sale. Payments go straight from the student’s
-        wallet to yours through the SkillPay contract on Arc, so there’s nothing to withdraw and no payout schedule.
+        wallet to yours through the iSabi contract on Arc, so there’s nothing to withdraw and no payout schedule.
       </p>
       <ul className="pitch-points">
         <li>Free to register as a tutor</li>
@@ -103,7 +103,7 @@ function TutorDashboard() {
           <h1>Hi, {profile.displayName}</h1>
           <p>
             {suspended
-              ? 'Your tutor account is suspended. Contact SkillPay support.'
+              ? 'Your tutor account is suspended. Contact iSabi support.'
               : 'Here’s how your courses are doing.'}
           </p>
         </div>
@@ -274,7 +274,7 @@ function RegisterStep({ metadataURI, onDone }) {
     <div className="gate">
       <h2>Register your wallet as a tutor</h2>
       <p>
-        This records your wallet as a tutor in the SkillPay contract, so students’ payments can reach you. It’s free
+        This records your wallet as a tutor in the iSabi contract, so students’ payments can reach you. It’s free
         apart from a network fee of well under a cent.
       </p>
       <button className="btn btn-primary" onClick={register} disabled={Boolean(pending)}>

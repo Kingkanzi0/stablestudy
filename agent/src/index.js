@@ -74,7 +74,7 @@ export async function runOnce(cfg, me) {
 async function main() {
   const cfg = loadConfig()
   const me = await agentAddress(cfg)
-  log(`SkillPay verifier agent ${me} on Arc ${cfg.networkKey}; judge=${cfg.judge}; signer=${cfg.signer}${cfg.dryRun ? '; DRY RUN' : ''}`)
+  log(`iSabi verifier agent ${me} on Arc ${cfg.networkKey}; judge=${cfg.judge}; signer=${cfg.signer}${cfg.dryRun ? '; DRY RUN' : ''}`)
   const once = process.argv.includes('--once')
   do {
     try {

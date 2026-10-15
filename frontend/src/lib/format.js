@@ -48,7 +48,7 @@ export function friendlyError(err) {
   if (/AlreadyRegistered/.test(msg)) return 'This wallet is already registered as a tutor.'
   if (/NotRegisteredTutor/.test(msg)) return 'Register as a tutor first.'
   if (/InvalidPrice/.test(msg)) return 'Price must be between 0.01 and 10,000 USDC.'
-  if (/EnforcedPause/.test(msg)) return 'SkillPay is paused for maintenance. Try again soon.'
+  if (/EnforcedPause/.test(msg)) return 'iSabi is paused for maintenance. Try again soon.'
   if (/InvalidProvider/.test(msg)) return 'Enter a different wallet for the provider (not your own).'
   if (/InvalidAmount/.test(msg)) return 'Amount must be between 0.10 and 1,000,000 USDC.'
   if (/InvalidDeadline/.test(msg)) return 'Pick a deadline at least 2 hours and at most a year away.'

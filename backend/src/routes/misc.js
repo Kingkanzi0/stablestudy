@@ -16,7 +16,7 @@ router.get(
     const state = await prisma.indexerState.findUnique({ where: { id: 1 } }).catch(() => null);
     res.json({
       status: 'ok',
-      service: 'SkillPay API',
+      service: 'iSabi API',
       version: '2.0.0',
       network: { name: network.name, chainId: network.id, explorer: network.explorer },
       contract: contractAddress,

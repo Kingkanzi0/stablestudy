@@ -1,0 +1,14 @@
+{
+  "name": "iSabi",
+  "short_name": "iSabi",
+  "description": "Learn skills, get hired and get paid in USDC on Arc.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F4F6F9",
+  "theme_color": "#0E2A47",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

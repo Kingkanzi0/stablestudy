@@ -1,8 +1,8 @@
-# SkillPay verifier agent
+# iSabi verifier agent
 
 The agent that decides whether escrow work meets its spec. It:
 
-1. reads its queue of delivered orders from the SkillPay API,
+1. reads its queue of delivered orders from the iSabi API,
 2. opens the delivery link and asks Claude to check it against each acceptance criterion,
 3. saves a written report (both parties can read it on the order page),
 4. signs `verify(orderId, approved, reportHash)` on the SkillPayEscrow contract from its own **Circle Agent Wallet** on Arc.

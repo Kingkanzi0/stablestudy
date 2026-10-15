@@ -1,4 +1,4 @@
-/* ───────────────────────────── SkillPay design tokens ───────────────────────────── */
+/* ───────────────────────────── iSabi design tokens ───────────────────────────── */
 :root {
   --ink: #0e2a47; /* deep navy: brand, headings */
   --usdc: #2775ca; /* USDC blue: primary actions */
@@ -6,6 +6,7 @@
   --settle: #1f9d6b; /* settled payments */
   --marigold: #f2b33d; /* tutor earnings */
   --marigold-soft: #fdf1d8;
+  --marigold-ink: #a86a12; /* marigold text on light backgrounds */
   --paper: #f4f6f9;
   --surface: #ffffff;
   --line: #dbe2ea;
@@ -225,6 +226,9 @@ code {
   color: var(--ink);
   letter-spacing: -0.02em;
 }
+.logo-i {
+  color: var(--marigold-ink);
+}
 .nav {
   display: flex;
   align-items: center;
@@ -249,18 +253,6 @@ code {
 .nav .connect {
   margin-left: 10px;
 }
-.nav-toggle {
-  display: none;
-  background: none;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--r-sm);
-  width: 42px;
-  height: 42px;
-  font-size: 1.1rem;
-  cursor: pointer;
-  color: var(--ink);
-}
-
 main {
   min-height: 60vh;
 }
@@ -412,7 +404,7 @@ main {
   margin-top: 28px;
 }
 
-/* The receipt: SkillPay's signature element */
+/* The receipt: iSabi's signature element */
 .receipt {
   position: relative;
   margin: 0;
@@ -1536,36 +1528,40 @@ textarea:focus {
   }
 }
 @media (max-width: 760px) {
-  .nav-toggle {
-    display: block;
+  .topbar-inner {
+    height: 60px;
+    gap: 12px;
   }
   .nav {
     display: none;
-    position: absolute;
-    top: 68px;
-    left: 0;
-    right: 0;
-    flex-direction: column;
-    align-items: stretch;
-    background: var(--surface);
-    border-bottom: 1px solid var(--line);
-    padding: 12px var(--gutter) 18px;
   }
-  .nav.nav-open {
-    display: flex;
+  /* Room for the tab bar so it never covers the end of a page */
+  .shell {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
   }
-  .nav .connect {
-    margin: 8px 0 0;
+  .connect .btn {
+    min-height: 40px;
   }
-  .nav .connect .btn {
-    width: 100%;
+  .btn-wallet {
+    padding: 0 4px 0 10px;
+    gap: 8px;
   }
-  .nav > a.active {
-    box-shadow: inset 3px 0 0 var(--usdc);
+  /* Keep form buttons and toasts above the tab bar */
+  .sticky-actions {
+    bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+  .toasts {
+    left: 12px;
+    right: 12px;
+    bottom: calc(72px + env(safe-area-inset-bottom));
+    max-width: none;
   }
   .menu {
-    left: 0;
-    right: 0;
+    position: fixed;
+    top: 64px;
+    left: 12px;
+    right: 12px;
+    min-width: 0;
   }
   .filters {
     flex-direction: column;
@@ -2121,4 +2117,78 @@ textarea:focus {
 }
 .link-button:hover:not(:disabled) {
   opacity: 1;
+}
+
+/* ───────────────────────────── Phone tab bar ───────────────────────────── */
+.tabbar {
+  display: none;
+  grid-template-columns: repeat(5, 1fr);
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 25;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  padding: 4px 4px env(safe-area-inset-bottom);
+  box-shadow: 0 -8px 24px -18px rgba(14, 42, 71, 0.35);
+}
+.tabbar a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 56px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: var(--r-sm);
+  -webkit-tap-highlight-color: transparent;
+}
+.tabbar a.active {
+  color: var(--usdc-deep);
+}
+.tabbar a.active svg {
+  color: var(--usdc);
+}
+.tabbar a:focus-visible {
+  outline: 2px solid var(--usdc);
+  outline-offset: -2px;
+}
+@media (max-width: 760px) {
+  .tabbar {
+    display: grid;
+  }
+}
+
+/* ───────────────────────────── Touch screens ───────────────────────────── */
+@media (pointer: coarse) {
+  .btn,
+  .btn-sm {
+    min-height: 44px;
+  }
+  .chip {
+    min-height: 40px;
+    padding: 8px 16px;
+  }
+  .link-button {
+    min-height: 44px;
+  }
+  .menu-item {
+    min-height: 48px;
+  }
+}
+@media (max-width: 420px) {
+  /* Small phones: keep the address, drop the balance from the header button */
+  .btn-wallet .wallet-balance {
+    display: none;
+  }
+  .btn-wallet {
+    padding: 0 4px;
+  }
+  .hero-actions .btn {
+    flex: 1 1 auto;
+  }
 }

@@ -109,7 +109,7 @@ function Form() {
         </Link>
         <h1>Hire with escrow</h1>
         <p>
-          Your USDC is locked in a smart contract, not sent to the provider. It’s released when SkillPay’s verifier agent
+          Your USDC is locked in a smart contract, not sent to the provider. It’s released when iSabi’s verifier agent
           confirms the work meets every criterion below, or when you approve it yourself.
         </p>
       </header>
@@ -117,7 +117,7 @@ function Form() {
       <ol className="escrow-explainer">
         <li>
           <strong>You lock the payment</strong>
-          <span>Nobody can touch it, including SkillPay.</span>
+          <span>Nobody can touch it, including iSabi.</span>
         </li>
         <li>
           <strong>They deliver</strong>
@@ -198,7 +198,7 @@ function Form() {
         {units !== null && fee !== null && (
           <p className="muted">
             The provider receives {formatUsdc(units - fee)} USDC when the work is approved; {formatUsdc(fee)} USDC goes to
-            SkillPay. If they don’t deliver by the deadline, you get the full {formatUsdc(units)} USDC back.
+            iSabi. If they don’t deliver by the deadline, you get the full {formatUsdc(units)} USDC back.
           </p>
         )}
         {lowBalance && (
