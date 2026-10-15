@@ -73,9 +73,10 @@ jobs:
           anvil --silent &
           sleep 3
           USDC=$(forge create test/mocks/MockUSDC.sol:MockUSDC --rpc-url $RPC_URL --private-key $DEPLOYER_PK --broadcast | awk '/Deployed to/{print $3}')
+          # mint first: the deploy scripts refuse a token with zero supply
+          cast send $USDC "mint(address,uint256)" $CLIENT_ADDR 1000000000 --rpc-url $RPC_URL --private-key $DEPLOYER_PK
           SKILLPAY=$(USDC_ADDRESS=$USDC TREASURY=$OWNER_ADDR OWNER=$OWNER_ADDR forge script script/Deploy.s.sol --rpc-url $RPC_URL --private-key $DEPLOYER_PK --broadcast | awk '/SkillPay deployed at/{print $4}')
           ESCROW=$(USDC_ADDRESS=$USDC TREASURY=$OWNER_ADDR OWNER=$OWNER_ADDR VERIFIER=$AGENT_ADDR ARBITER=$OWNER_ADDR forge script script/DeployEscrow.s.sol --rpc-url $RPC_URL --private-key $DEPLOYER_PK --broadcast | awk '/SkillPayEscrow deployed at/{print $4}')
-          cast send $USDC "mint(address,uint256)" $CLIENT_ADDR 1000000000 --rpc-url $RPC_URL --private-key $DEPLOYER_PK
           echo "USDC=$USDC" >> $GITHUB_ENV
           echo "SKILLPAY=$SKILLPAY" >> $GITHUB_ENV
           echo "ESCROW=$ESCROW" >> $GITHUB_ENV
