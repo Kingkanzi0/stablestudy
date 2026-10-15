@@ -57,12 +57,7 @@ function Form() {
     )
   }
 
-  let units = null
-  try {
-    units = form.amount ? parseUsdc(form.amount) : null
-  } catch {
-    units = null
-  }
+  const units = safeParseUsdc(form.amount)
   const fee = units !== null && feeBps !== undefined ? (units * BigInt(feeBps)) / 10_000n : null
   const lowBalance = units !== null && balance !== undefined && balance < units
 
@@ -230,4 +225,14 @@ function Form() {
       </div>
     </form>
   )
+}
+
+/** "12.5" -> 12500000n; empty or invalid input -> null */
+function safeParseUsdc(value) {
+  if (!value) return null
+  try {
+    return parseUsdc(value)
+  } catch {
+    return null
+  }
 }
