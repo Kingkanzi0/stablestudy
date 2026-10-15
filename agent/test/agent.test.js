@@ -2,7 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { normalizeVerdict, buildUserPrompt, judgeMock } from '../src/judge.js'
 import { htmlToText, githubReadmeUrl, fetchDelivery } from '../src/fetchDelivery.js'
-import { parseTxHash, circleArgs } from '../src/signer.js'
+import { parseTxHash, circleArgs, circleCommand } from '../src/signer.js'
 import { loadConfig } from '../src/config.js'
 
 const item = {
@@ -117,4 +117,13 @@ test('config refuses unsafe or incomplete settings', () => {
   })
   assert.equal(cfg.apiUrl, 'https://x/api')
   assert.equal(cfg.network.circleChain, 'ARC-TESTNET')
+})
+
+test('circleCommand quotes arguments and uses the shell on Windows only', () => {
+  const args = ['wallet', 'execute', 'verify(uint256,bool,bytes32)', '7']
+  assert.deepEqual(circleCommand({ circleBin: 'circle' }, args, 'linux'), { file: 'circle', args, shell: false })
+  const win = circleCommand({ circleBin: 'circle' }, args, 'win32')
+  assert.equal(win.shell, true)
+  assert.equal(win.file, '"circle"')
+  assert.deepEqual(win.args, ['"wallet"', '"execute"', '"verify(uint256,bool,bytes32)"', '"7"'])
 })
