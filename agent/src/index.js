@@ -1,3 +1,4 @@
+import { pathToFileURL } from 'node:url'
 import { loadConfig } from './config.js'
 import { fetchDelivery } from './fetchDelivery.js'
 import { judgeMock, judgeWithClaude } from './judge.js'
@@ -86,7 +87,8 @@ async function main() {
   } while (!once)
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// pathToFileURL makes this work on Windows too (C:\... paths)
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {
     console.error(err.message)
     process.exit(1)
