@@ -8,7 +8,7 @@ iSabi is a tutoring marketplace on [Arc](https://arc.io), Circle's stablecoin-na
 
 > Previously **StableStudy**, then **SkillPay**. v2 replaced the mock payment flow with a real, tested smart contract, wallet sign-in, on-chain verification and a redesigned app.
 
-Live demo (Arc Testnet): https://isabi.vercel.app
+Live demo (Arc Testnet): https://isabi-arc.vercel.app
 
 ---
 
