@@ -50,6 +50,7 @@ export const network = {
   usdcAddress: base.usdc,
   faucet: base.faucet,
   skillPayAddress: import.meta.env.VITE_SKILLPAY_ADDRESS,
+  escrowAddress: /^0x[0-9a-fA-F]{40}$/.test(import.meta.env.VITE_ESCROW_ADDRESS || '') ? import.meta.env.VITE_ESCROW_ADDRESS : null,
   apiUrl: (import.meta.env.VITE_API_URL || 'http://localhost:5001/api').replace(/\/$/, ''),
 }
 

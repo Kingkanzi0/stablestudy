@@ -1,0 +1,19 @@
+{
+  "name": "skillpay-verifier-agent",
+  "version": "1.0.0",
+  "description": "SkillPay verifier agent: reviews escrow deliveries against their spec with Claude and signs the decision on Arc from a Circle agent wallet.",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.18"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/index.js",
+    "once": "node --env-file-if-exists=.env src/index.js --once",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.60.0",
+    "viem": "^2.21.0"
+  }
+}

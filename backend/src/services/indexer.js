@@ -1,6 +1,7 @@
 const { decodeEventLog } = require('viem');
 const { prisma } = require('../db');
-const { publicClient, skillPay } = require('../chain');
+const { publicClient, skillPay, escrow } = require('../chain');
+const { processEscrowLog } = require('./escrow');
 const { env, contractAddress } = require('../config');
 const { lower } = require('../utils');
 
@@ -118,10 +119,15 @@ const handlers = {
   },
 };
 
-/** Processes raw logs from the SkillPay contract. Safe to call repeatedly with the same logs. */
+/** Processes raw logs from the SkillPay and escrow contracts. Safe to call repeatedly with the same logs. */
 async function processLogs(logs) {
   const results = [];
   for (const log of logs) {
+    const escrowEvent = await processEscrowLog(log);
+    if (escrowEvent) {
+      results.push(escrowEvent);
+      continue;
+    }
     if (lower(log.address) !== contractAddress) continue;
     const event = decode(log);
     if (!event) continue;
@@ -145,9 +151,17 @@ async function syncTransaction(hash) {
 let running = false;
 let timer = null;
 
-async function getLastBlock() {
-  const state = await prisma.indexerState.findUnique({ where: { id: 1 } });
-  return state ? state.lastBlock : env.START_BLOCK > 0n ? env.START_BLOCK - 1n : 0n;
+// Each contract is followed separately (IndexerState id 1 = SkillPay, id 2 = escrow), so the escrow
+// can be deployed and added later without re-scanning SkillPay's history.
+function streams() {
+  const list = [{ id: 1, address: skillPay.address, start: env.START_BLOCK }];
+  if (escrow) list.push({ id: 2, address: escrow.address, start: env.ESCROW_START_BLOCK });
+  return list;
+}
+
+async function getLastBlock(stream) {
+  const state = await prisma.indexerState.findUnique({ where: { id: stream.id } });
+  return state ? state.lastBlock : stream.start > 0n ? stream.start - 1n : 0n;
 }
 
 async function tick() {
@@ -155,17 +169,19 @@ async function tick() {
   running = true;
   try {
     const latest = await publicClient.getBlockNumber();
-    let from = (await getLastBlock()) + 1n;
-    while (from <= latest) {
-      const to = from + env.INDEXER_BLOCK_RANGE - 1n < latest ? from + env.INDEXER_BLOCK_RANGE - 1n : latest;
-      const logs = await publicClient.getLogs({ address: skillPay.address, fromBlock: from, toBlock: to });
-      await processLogs(logs);
-      await prisma.indexerState.upsert({
-        where: { id: 1 },
-        update: { lastBlock: to },
-        create: { id: 1, lastBlock: to },
-      });
-      from = to + 1n;
+    for (const stream of streams()) {
+      let from = (await getLastBlock(stream)) + 1n;
+      while (from <= latest) {
+        const to = from + env.INDEXER_BLOCK_RANGE - 1n < latest ? from + env.INDEXER_BLOCK_RANGE - 1n : latest;
+        const logs = await publicClient.getLogs({ address: stream.address, fromBlock: from, toBlock: to });
+        await processLogs(logs);
+        await prisma.indexerState.upsert({
+          where: { id: stream.id },
+          update: { lastBlock: to },
+          create: { id: stream.id, lastBlock: to },
+        });
+        from = to + 1n;
+      }
     }
   } catch (err) {
     console.error('[indexer] error:', err.shortMessage || err.message);
@@ -179,7 +195,7 @@ function startIndexer() {
     console.log('[indexer] disabled');
     return;
   }
-  console.log(`[indexer] watching ${skillPay.address} every ${env.INDEXER_INTERVAL_MS}ms`);
+  console.log(`[indexer] watching ${streams().map((s) => s.address).join(', ')} every ${env.INDEXER_INTERVAL_MS}ms`);
   tick();
   timer = setInterval(tick, env.INDEXER_INTERVAL_MS);
 }

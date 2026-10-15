@@ -12,6 +12,9 @@ import Jobs from './pages/Jobs'
 import JobDetail from './pages/JobDetail'
 import JobEditor from './pages/JobEditor'
 import MyJobs from './pages/MyJobs'
+import EscrowList from './pages/EscrowList'
+import EscrowNew from './pages/EscrowNew'
+import EscrowOrder from './pages/EscrowOrder'
 
 export default function App() {
   return (
@@ -31,6 +34,9 @@ export default function App() {
         <Route path="jobs/mine" element={<MyJobs />} />
         <Route path="jobs/:id" element={<JobDetail />} />
         <Route path="jobs/:id/edit" element={<JobEditor />} />
+        <Route path="escrow" element={<EscrowList />} />
+        <Route path="escrow/new" element={<EscrowNew />} />
+        <Route path="escrow/:id" element={<EscrowOrder />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

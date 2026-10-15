@@ -65,6 +65,7 @@ export default function Layout() {
             <NavLink to="/courses">Explore</NavLink>
             <NavLink to="/learn">My learning</NavLink>
             <NavLink to="/jobs">Jobs</NavLink>
+            <NavLink to="/escrow">Escrow</NavLink>
             <NavLink to="/teach">Teach</NavLink>
             <ConnectButton />
           </nav>
@@ -91,6 +92,7 @@ export default function Layout() {
             <Link to="/courses">Explore courses</Link>
             <Link to="/teach">Teach on SkillPay</Link>
             <Link to="/jobs">Web3 jobs</Link>
+            <Link to="/escrow/new">Hire with escrow</Link>
             {explorerAddress(network.skillPayAddress) && isConfigured && (
               <a href={explorerAddress(network.skillPayAddress)} target="_blank" rel="noreferrer">
                 Smart contract

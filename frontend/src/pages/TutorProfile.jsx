@@ -37,6 +37,9 @@ export default function TutorProfile() {
             )}
           </p>
         </div>
+        <Link to={`/escrow/new?provider=${tutor.address}`} className="btn btn-primary profile-hire">
+          Hire with escrow
+        </Link>
         <dl className="profile-stats">
           <div>
             <dt>Students</dt>

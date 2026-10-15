@@ -135,3 +135,91 @@ model Job {
   @@index([status, createdAt])
   @@index([posterAddress])
 }
+
+/// A service paid through the SkillPayEscrow contract. Starts as an off-chain DRAFT holding the spec;
+/// becomes FUNDED once the client's createOrder transaction is indexed.
+model Order {
+  id              String         @id @default(cuid())
+  /// Id assigned by the escrow contract
+  onchainId       Int?           @unique
+  clientAddress   String
+  providerAddress String
+  title           String
+  description     String
+  /// Acceptance criteria the verifier agent checks, one per entry
+  criteria        String[]
+  category        String
+  amountUnits     String
+  deadline        DateTime
+  /// keccak256 of the canonical spec JSON (specJson), committed on-chain
+  specHash        String         @unique
+  specJson        String
+  /// DRAFT FUNDED ACCEPTED DELIVERED REJECTED DISPUTED RELEASED REFUNDED CANCELLED RESOLVED
+  status          String         @default("DRAFT")
+  verifierAddress String?
+  reviewEnds      DateTime?
+  feeBps          Int?
+  createdTx       String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  deliveries Delivery[]
+  verdicts   Verdict[]
+  events     OrderEvent[]
+
+  @@index([clientAddress])
+  @@index([providerAddress])
+  @@index([status])
+}
+
+model Delivery {
+  id           String   @id @default(cuid())
+  orderId      String
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  url          String
+  notes        String
+  /// keccak256 of the canonical delivery JSON (recordJson), committed on-chain
+  deliveryHash String   @unique
+  recordJson   String
+  /// Set once DeliverySubmitted is indexed
+  number       Int?
+  submittedTx  String?
+  createdAt    DateTime @default(now())
+
+  @@index([orderId])
+}
+
+/// The verifier agent's written report. Its hash is what the agent signs on-chain.
+model Verdict {
+  id             String   @id @default(cuid())
+  orderId        String
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  deliveryNumber Int
+  approved       Boolean
+  summary        String
+  /// [{ criterion, met, note }]
+  checks         Json
+  model          String?
+  reasonHash     String   @unique
+  reportJson     String
+  txHash         String?
+  createdAt      DateTime @default(now())
+
+  @@index([orderId])
+}
+
+/// On-chain escrow events, for the order timeline.
+model OrderEvent {
+  id          String   @id @default(cuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  type        String
+  data        Json
+  txHash      String
+  logIndex    Int
+  blockNumber Int
+  createdAt   DateTime @default(now())
+
+  @@unique([txHash, logIndex])
+  @@index([orderId])
+}

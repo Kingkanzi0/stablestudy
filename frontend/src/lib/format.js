@@ -49,6 +49,15 @@ export function friendlyError(err) {
   if (/NotRegisteredTutor/.test(msg)) return 'Register as a tutor first.'
   if (/InvalidPrice/.test(msg)) return 'Price must be between 0.01 and 10,000 USDC.'
   if (/EnforcedPause/.test(msg)) return 'SkillPay is paused for maintenance. Try again soon.'
+  if (/InvalidProvider/.test(msg)) return 'Enter a different wallet for the provider (not your own).'
+  if (/InvalidAmount/.test(msg)) return 'Amount must be between 0.10 and 1,000,000 USDC.'
+  if (/InvalidDeadline/.test(msg)) return 'Pick a deadline at least 2 hours and at most a year away.'
+  if (/DeadlinePassed/.test(msg)) return 'The delivery deadline has passed.'
+  if (/DeadlineNotPassed/.test(msg)) return 'You can ask for a refund once the deadline has passed.'
+  if (/ReviewNotOver/.test(msg)) return 'The review window is still open.'
+  if (/TooManyDeliveries/.test(msg)) return 'This order has reached its limit of 3 deliveries.'
+  if (/WrongStatus/.test(msg)) return 'The order has moved on since you loaded this page. Refresh and try again.'
+  if (/NotClient|NotProvider|NotParty/.test(msg)) return 'This wallet isn’t part of this order.'
   return msg.split('\n')[0].slice(0, 200)
 }
 
