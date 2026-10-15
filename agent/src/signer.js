@@ -61,8 +61,19 @@ export function circleArgs(cfg, onchainId, approved, reasonHash) {
   ]
 }
 
+/**
+ * On Windows the npm-installed `circle` command is a .cmd script, which Node can only start through the shell.
+ * Every argument is plain hex, numbers or a fixed signature, so quoting each one is enough.
+ */
+export function circleCommand(cfg, args, platform = process.platform) {
+  if (platform !== 'win32') return { file: cfg.circleBin, args, shell: false }
+  return { file: `"${cfg.circleBin}"`, args: args.map((a) => `"${a}"`), shell: true }
+}
+
 async function signWithCircle(cfg, onchainId, approved, reasonHash) {
-  const { stdout, stderr } = await run(cfg.circleBin, circleArgs(cfg, onchainId, approved, reasonHash), {
+  const cmd = circleCommand(cfg, circleArgs(cfg, onchainId, approved, reasonHash))
+  const { stdout, stderr } = await run(cmd.file, cmd.args, {
+    shell: cmd.shell,
     timeout: 180_000,
     maxBuffer: 1_000_000,
   })

@@ -23,6 +23,14 @@ import {
   timeLeft,
 } from '../lib/escrow'
 
+const AMOUNT_NOTE = {
+  DRAFT: 'not locked yet',
+  RELEASED: 'paid to the provider',
+  RESOLVED: 'settled by the arbiter',
+  REFUNDED: 'refunded to the client',
+  CANCELLED: 'refunded to the client',
+}
+
 export default function EscrowOrder() {
   return (
     <div className="page">
@@ -81,7 +89,7 @@ function Order() {
           <span className="pay-price">
             {order.amount} <span>USDC</span>
           </span>
-          <span className="muted small">{status === 'DRAFT' ? 'not locked yet' : 'locked in escrow'}</span>
+          <span className="muted small">{AMOUNT_NOTE[status] || 'locked in escrow'}</span>
         </div>
       </header>
 
@@ -276,6 +284,7 @@ function ActionPanel({ view, deliveries, onDone }) {
   const [delivery, setDelivery] = useState({ url: '', notes: '' })
   const [errors, setErrors] = useState({})
   const [busy, setBusy] = useState(null)
+  const [confirmDispute, setConfirmDispute] = useState(false)
   const now = nowMs()
   const isClient = view.role === 'client'
   const isProvider = view.role === 'provider'
@@ -409,13 +418,8 @@ function ActionPanel({ view, deliveries, onDone }) {
       )
     }
   }
-  if ((s === 'DELIVERED' || s === 'REJECTED') && (isClient || isProvider)) {
-    actions.push(
-      <button key="dis" className="btn btn-ghost" disabled={disabled} onClick={() => tx({ ...escrow, functionName: 'dispute', args: [id] }, 'Sent to the arbiter')}>
-        Open a dispute
-      </button>,
-    )
-  }
+  // Disputes freeze the order until a human arbiter steps in, so they take a deliberate second click.
+  const canDispute = (s === 'DELIVERED' || s === 'REJECTED') && (isClient || isProvider)
   if (isClient && pastDeadline && ['FUNDED', 'ACCEPTED', 'REJECTED'].includes(s)) {
     message = 'The deadline passed without an approved delivery. You can take your payment back.'
     actions.unshift(
@@ -450,6 +454,34 @@ function ActionPanel({ view, deliveries, onDone }) {
             {busy || pending || 'Submit delivery'}
           </button>
         </form>
+      )}
+      {canDispute && (
+        <div className="dispute-zone">
+          {confirmDispute ? (
+            <>
+              <p className="muted small">
+                A dispute stops the escrow until a SkillPay arbiter decides how to split the payment. No more revisions or
+                approvals can happen in the meantime. Only do this if you can’t agree.
+              </p>
+              <div className="action-buttons">
+                <button
+                  className="btn btn-ghost btn-sm"
+                  disabled={disabled}
+                  onClick={() => tx({ ...escrow, functionName: 'dispute', args: [id] }, 'Sent to the arbiter')}
+                >
+                  {pending || 'Yes, open a dispute'}
+                </button>
+                <button className="btn btn-ghost btn-sm" onClick={() => setConfirmDispute(false)} disabled={disabled}>
+                  Keep working on it
+                </button>
+              </div>
+            </>
+          ) : (
+            <button className="link-button small" onClick={() => setConfirmDispute(true)} disabled={disabled}>
+              Can’t agree? Ask an arbiter to decide
+            </button>
+          )}
+        </div>
       )}
     </section>
   )
