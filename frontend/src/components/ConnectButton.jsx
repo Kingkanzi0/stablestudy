@@ -36,8 +36,14 @@ export default function ConnectButton() {
   }, [open])
 
   // EIP-6963 wallets have their own entries; hide the generic one when real wallets exist.
-  const named = connectors.filter((c) => c.id !== 'injected')
-  const wallets = named.length ? named : connectors
+  // The generic "injected" entry is always registered, even on a phone browser with no wallet,
+  // so only offer it when a wallet has actually put a provider on the page.
+  const hasInjected = typeof window !== 'undefined' && Boolean(window.ethereum)
+  const named = connectors.filter((c) => c.id !== 'injected' && c.id !== 'walletConnect')
+  const generic = connectors.filter((c) => c.id === 'injected' && hasInjected)
+  const remote = connectors.filter((c) => c.id === 'walletConnect')
+  const wallets = [...(named.length ? named : generic), ...remote]
+  const browserWallets = named.length || generic.length
 
   async function connect(connector) {
     try {
@@ -57,13 +63,12 @@ export default function ConnectButton() {
         </button>
         {open && (
           <div className="menu" role="menu">
-            {noWallet ? (
-              <OpenInWallet />
-            ) : (
+            {!browserWallets && <OpenInWallet />}
+            {noWallet ? null : (
               wallets.map((c) => (
                 <button key={c.uid} className="menu-item" role="menuitem" onClick={() => connect(c)}>
                   {c.icon ? <img src={c.icon} alt="" width="20" height="20" /> : <span className="wallet-dot" />}
-                  {c.name === 'Injected' ? 'Browser wallet' : c.name}
+                  {c.name === 'Injected' ? 'Browser wallet' : c.id === 'walletConnect' ? 'Other wallet app (WalletConnect)' : c.name}
                 </button>
               ))
             )}
