@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, skillpay-v2]
+    branches: [main]
   pull_request:
 
 jobs:
@@ -21,7 +21,94 @@ jobs:
       - name: Check the ABI copies are up to date
         run: |
           ./export-abi.sh
-          git diff --exit-code ../frontend/src/contracts ../backend/src/contracts
+          git diff --exit-code ../frontend/src/contracts ../backend/src/contracts ../agent/src/contracts
+
+  agent:
+    name: Verifier agent unit tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: agent
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm test
+
+  e2e:
+    name: Escrow end-to-end (local chain + API + agent)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: skillpay
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      RPC_URL: http://127.0.0.1:8545
+      # Anvil's well-known test keys (never use these for real funds)
+      DEPLOYER_PK: '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+      CLIENT_PK: '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d'
+      PROVIDER_PK: '0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a'
+      AGENT_PK: '0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6'
+      AGENT_ADDR: '0x90F79bf6EB2c4f870365E785982E1f101E93b906'
+      OWNER_ADDR: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
+      CLIENT_ADDR: '0x70997970C51812dc3A010C7d01b50e0d17dc79C8'
+      AGENT_API_KEY: ci-only-agent-key-0123456789abcdef
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Start a local chain and deploy the contracts
+        working-directory: contracts
+        run: |
+          ./setup.sh
+          anvil --silent &
+          sleep 3
+          USDC=$(forge create test/mocks/MockUSDC.sol:MockUSDC --rpc-url $RPC_URL --private-key $DEPLOYER_PK --broadcast | awk '/Deployed to/{print $3}')
+          SKILLPAY=$(USDC_ADDRESS=$USDC TREASURY=$OWNER_ADDR OWNER=$OWNER_ADDR forge script script/Deploy.s.sol --rpc-url $RPC_URL --private-key $DEPLOYER_PK --broadcast | awk '/SkillPay deployed at/{print $4}')
+          ESCROW=$(USDC_ADDRESS=$USDC TREASURY=$OWNER_ADDR OWNER=$OWNER_ADDR VERIFIER=$AGENT_ADDR ARBITER=$OWNER_ADDR forge script script/DeployEscrow.s.sol --rpc-url $RPC_URL --private-key $DEPLOYER_PK --broadcast | awk '/SkillPayEscrow deployed at/{print $4}')
+          cast send $USDC "mint(address,uint256)" $CLIENT_ADDR 1000000000 --rpc-url $RPC_URL --private-key $DEPLOYER_PK
+          echo "USDC=$USDC" >> $GITHUB_ENV
+          echo "SKILLPAY=$SKILLPAY" >> $GITHUB_ENV
+          echo "ESCROW=$ESCROW" >> $GITHUB_ENV
+          echo "USDC=$USDC SKILLPAY=$SKILLPAY ESCROW=$ESCROW"
+          test -n "$USDC" && test -n "$SKILLPAY" && test -n "$ESCROW"
+      - name: Install the agent
+        working-directory: agent
+        run: npm install
+      - name: Start the API
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/skillpay
+          JWT_SECRET: ci-only-secret-not-for-production
+          ARC_NETWORK: local
+          CLIENT_URL: http://localhost:5173
+          INDEXER_ENABLED: 'false'
+          PORT: '5001'
+        run: |
+          npm install
+          npx prisma migrate deploy
+          SKILLPAY_ADDRESS=$SKILLPAY ESCROW_ADDRESS=$ESCROW node src/index.js > api.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS localhost:5001/api/health && break; sleep 1; done
+          curl -fsS localhost:5001/api/health | grep -q '"escrow":"0x'
+      - name: Run the escrow flow end to end
+        working-directory: backend
+        env:
+          API_URL: http://localhost:5001/api
+          AGENT_DIR: ${{ github.workspace }}/agent
+        run: node scripts/e2e.mjs
+      - name: API log
+        if: always()
+        working-directory: backend
+        run: cat api.log || true
 
   backend:
     name: Backend

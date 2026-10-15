@@ -2,7 +2,7 @@ const express = require('express');
 const { z } = require('zod');
 const { prisma } = require('../db');
 const { syncTransaction } = require('../services/indexer');
-const { network, contractAddress } = require('../config');
+const { network, contractAddress, escrowAddress } = require('../config');
 const { asyncHandler, HttpError, lower, formatUsdc } = require('../utils');
 const S = require('../serializers');
 
@@ -20,6 +20,7 @@ router.get(
       version: '2.0.0',
       network: { name: network.name, chainId: network.id, explorer: network.explorer },
       contract: contractAddress,
+      escrow: escrowAddress,
       indexedBlock: state ? state.lastBlock.toString() : null,
     });
   }),
@@ -30,6 +31,7 @@ router.get('/config', (_req, res) => {
   res.json({
     network: { key: network.key, name: network.name, chainId: network.id, explorer: network.explorer },
     contract: contractAddress,
+    escrow: escrowAddress,
     categories: S.CATEGORIES,
     levels: S.LEVELS,
   });

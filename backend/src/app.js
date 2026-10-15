@@ -34,6 +34,8 @@ app.use('/api/sync', writeLimiter);
 app.use('/api/courses', require('./routes/courses'));
 app.use('/api/tutors', require('./routes/tutors'));
 app.use('/api/jobs', require('./routes/jobs'));
+app.use('/api/orders', require('./routes/orders').router);
+app.use('/api/agent', require('./routes/agent'));
 app.use('/api', require('./routes/misc'));
 
 app.use(notFound);

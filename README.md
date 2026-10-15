@@ -39,6 +39,8 @@ Student wallet ──approve + enroll(courseId)──▶ SkillPay contract
 
 **Tutors**: free registration, course editor with lessons, video and resource links, publish on-chain with a USDC price, change price or hide courses at any time, live earnings dashboard and sales history. Earnings arrive instantly, so there's nothing to withdraw.
 
+**Escrow for services, checked by an AI agent**: a client locks USDC for a job with written acceptance criteria; the provider delivers a link; SkillPay's verifier agent (an Arc Agent Stack wallet + Claude) checks each criterion, writes a report and signs release or reject on-chain. The client can approve directly, missed deadlines refund the client, unreviewed deliveries can be claimed, and disputes go to a human arbiter. See [agent/README.md](agent/README.md).
+
 **Web3 jobs board**: anyone signed in with a wallet can post roles, contracts and bounties (with USDC pay ranges); learners browse, filter and apply, and each job links to related SkillPay courses.
 
 **Platform**: fee capped at 20% in the contract, pause switch for emergencies, tutor and course moderation, two-step ownership transfer.
@@ -46,7 +48,8 @@ Student wallet ──approve + enroll(courseId)──▶ SkillPay contract
 ## Repository layout
 
 ```
-contracts/   Solidity contract (Foundry): SkillPay.sol, 32 tests incl. fuzzing, deploy script
+contracts/   Solidity (Foundry): SkillPay.sol + SkillPayEscrow.sol, 67 tests incl. fuzzing and an invariant
+agent/       Verifier agent: Claude judge + Circle Agent Wallet signer
 backend/     Node.js API: Express, Prisma/PostgreSQL, viem indexer, Sign-In with Ethereum
 frontend/    React + Vite + wagmi app
 docs/        Deployment guide and demo script

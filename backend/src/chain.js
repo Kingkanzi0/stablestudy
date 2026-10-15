@@ -1,6 +1,7 @@
 const { createPublicClient, http, defineChain } = require('viem');
-const { network, contractAddress } = require('./config');
+const { network, contractAddress, escrowAddress } = require('./config');
 const skillPayAbi = require('./contracts/skillPayAbi.json');
+const escrowAbi = require('./contracts/escrowAbi.json');
 
 const chain = defineChain({
   id: network.id,
@@ -22,6 +23,8 @@ const skillPay = {
   abi: skillPayAbi,
 };
 
+const escrow = escrowAddress ? { address: escrowAddress, abi: escrowAbi } : null;
+
 /** Reads isEnrolled(courseId, student) directly from the contract. */
 async function isEnrolledOnchain(onchainId, student) {
   return publicClient.readContract({
@@ -31,4 +34,4 @@ async function isEnrolledOnchain(onchainId, student) {
   });
 }
 
-module.exports = { chain, publicClient, skillPay, isEnrolledOnchain };
+module.exports = { chain, publicClient, skillPay, escrow, isEnrolledOnchain };

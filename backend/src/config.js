@@ -41,6 +41,15 @@ const schema = z.object({
     .transform((v) => v === 'true'),
   INDEXER_INTERVAL_MS: z.coerce.number().int().min(1000).default(5000),
   INDEXER_BLOCK_RANGE: z.coerce.bigint().default(5000n),
+  // Escrow (optional until the escrow contract is deployed)
+  ESCROW_ADDRESS: address.optional().or(z.literal('').transform(() => undefined)),
+  ESCROW_START_BLOCK: z.coerce.bigint().default(0n),
+  // Shared secret the verifier agent uses to read its queue and post reports
+  AGENT_API_KEY: z
+    .string()
+    .min(24, 'AGENT_API_KEY must be at least 24 characters')
+    .optional()
+    .or(z.literal('').transform(() => undefined)),
 });
 
 const parsed = schema.safeParse(process.env);
@@ -61,5 +70,6 @@ module.exports = {
   network: { ...network, key: env.ARC_NETWORK, rpcUrl: env.RPC_URL || network.rpcUrl },
   allowedOrigins: env.CLIENT_URL.split(',').map((s) => s.trim()).filter(Boolean),
   contractAddress: env.SKILLPAY_ADDRESS.toLowerCase(),
+  escrowAddress: env.ESCROW_ADDRESS ? env.ESCROW_ADDRESS.toLowerCase() : null,
   USDC_DECIMALS: 6,
 };

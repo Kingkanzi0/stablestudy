@@ -76,6 +76,19 @@ export default function Home() {
         )}
       </section>
 
+      <section className="section escrow-band">
+        <div>
+          <h2>Hire anyone. Pay only for work that meets the brief.</h2>
+          <p>
+            Lock USDC in escrow, list what “done” means, and SkillPay’s verifier agent on Arc checks the delivery against
+            each point before the money moves. You can always approve it yourself, and missed deadlines refund you.
+          </p>
+        </div>
+        <Link to="/escrow/new" className="btn btn-marigold btn-lg">
+          Hire with escrow
+        </Link>
+      </section>
+
       <section className="section">
         <div className="section-head">
           <h2>Latest Web3 jobs</h2>
