@@ -23,6 +23,14 @@ import {
   timeLeft,
 } from '../lib/escrow'
 
+const AMOUNT_NOTE = {
+  DRAFT: 'not locked yet',
+  RELEASED: 'paid to the provider',
+  RESOLVED: 'settled by the arbiter',
+  REFUNDED: 'refunded to the client',
+  CANCELLED: 'refunded to the client',
+}
+
 export default function EscrowOrder() {
   return (
     <div className="page">
@@ -81,7 +89,7 @@ function Order() {
           <span className="pay-price">
             {order.amount} <span>USDC</span>
           </span>
-          <span className="muted small">{status === 'DRAFT' ? 'not locked yet' : 'locked in escrow'}</span>
+          <span className="muted small">{AMOUNT_NOTE[status] || 'locked in escrow'}</span>
         </div>
       </header>
 
