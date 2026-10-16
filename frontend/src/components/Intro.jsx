@@ -17,12 +17,12 @@ function shouldPlay() {
 // Decided once when the app loads (not during render), so it plays on the first page only.
 const PLAY_ON_LOAD = shouldPlay()
 
-/** Opening animation, once per visit: the gold "i" blinks, then "Sabi" slides in beside it. */
+/** Opening animation, once per visit: the gold "i" blinks, "Sabi" slides in, then the tagline. Tap to skip. */
 export default function Intro() {
   const [show, setShow] = useState(PLAY_ON_LOAD)
   useEffect(() => {
     if (!show) return
-    const t = setTimeout(() => setShow(false), 1000)
+    const t = setTimeout(() => setShow(false), 3000)
     return () => clearTimeout(t)
   }, [show])
   if (!show) return null
@@ -32,6 +32,7 @@ export default function Intro() {
         <span className="intro-i">i</span>
         <span className="intro-sabi">Sabi</span>
       </div>
+      <p className="intro-tag">Learn it. Do it. Get paid.</p>
     </div>
   )
 }
