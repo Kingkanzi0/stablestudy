@@ -1,12 +1,15 @@
 import { Link, useParams } from 'react-router-dom'
 import { Avatar, CourseCard, EmptyState, ErrorState, Spinner } from '../components/common'
 import { useApi } from '../hooks/useApi'
+import { useProfile } from '../hooks/useProfile'
+import Socials from '../components/Socials'
 import { explorerAddress } from '../config/network'
 import { shortAddress } from '../lib/format'
 
 export default function TutorProfile() {
   const { address } = useParams()
   const { data, isLoading, error, refetch } = useApi(`/tutors/${address}`)
+  const profile = useProfile(address)
 
   if (isLoading) return <Spinner label="Loading tutor" />
   if (error) return <ErrorState error={error} onRetry={refetch} />
@@ -15,7 +18,7 @@ export default function TutorProfile() {
   return (
     <div className="page">
       <header className="profile-head">
-        <Avatar tutor={tutor} size={88} />
+        <Avatar tutor={{ ...tutor, avatarUrl: tutor.avatarUrl || profile?.avatarUrl }} size={88} />
         <div>
           <h1>{tutor.displayName}</h1>
           {tutor.headline && <p className="profile-headline">{tutor.headline}</p>}
@@ -36,6 +39,7 @@ export default function TutorProfile() {
               </>
             )}
           </p>
+          <Socials socials={profile?.socials} />
         </div>
         <Link to={`/escrow/new?provider=${tutor.address}`} className="btn btn-primary profile-hire">
           Hire with escrow

@@ -1,4 +1,4 @@
-// SkillPay database schema.
+// iSabi database schema.
 // The blockchain is the source of truth for prices, ownership and enrolments.
 // This database stores off-chain metadata (titles, lessons, profiles) and an
 // index of on-chain events so the app can load quickly.
@@ -222,4 +222,82 @@ model OrderEvent {
 
   @@unique([txHash, logIndex])
   @@index([orderId])
+}
+
+/// A person on iSabi. Signs in with an email code, a wallet, or both (linked to one account).
+model User {
+  id          String   @id @default(cuid())
+  /// Lower-case email, set once verified with a code
+  email       String?  @unique
+  /// Lower-case wallet address, set once proven with Sign-In with Ethereum
+  wallet      String?  @unique
+  displayName String?
+  bio         String?
+  avatarId    String?
+  /// { x, telegram, discord, github, linkedin, website }
+  socials     Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+/// Small uploaded images (profile pictures, campaign logos), already resized in the browser.
+model Image {
+  id        String   @id @default(cuid())
+  ownerId   String
+  mime      String
+  data      Bytes
+  bytes     Int
+  createdAt DateTime @default(now())
+
+  @@index([ownerId])
+}
+
+/// One-time sign-in codes sent by email. Only a hash of the code is stored.
+model EmailCode {
+  id        String   @id @default(cuid())
+  email     String
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email, createdAt])
+}
+
+/// Airdrops, testnets, quests and incentive programmes listed by projects. Live once an admin approves.
+model Campaign {
+  id            String    @id @default(cuid())
+  ownerId       String
+  projectName   String
+  title         String
+  logoId        String?
+  summary       String
+  description   String
+  /// AIRDROP | TESTNET | QUEST | INCENTIVE | POINTS | OTHER
+  type          String
+  /// e.g. "Up to 50,000 USDC pool" or "Points + possible airdrop"
+  reward        String
+  /// FREE | GAS | DEPOSIT
+  cost          String    @default("FREE")
+  chain         String    @default("Arc")
+  startsAt      DateTime?
+  endsAt        DateTime?
+  websiteUrl    String
+  xUrl          String?
+  discordUrl    String?
+  telegramUrl   String?
+  /// [{ title, details, url? }]
+  steps         Json
+  tags          String[]  @default([])
+  /// PENDING | APPROVED | REJECTED
+  status        String    @default("PENDING")
+  reviewNote    String?
+  featured      Boolean   @default(false)
+  views         Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([status, endsAt])
+  @@index([ownerId])
 }

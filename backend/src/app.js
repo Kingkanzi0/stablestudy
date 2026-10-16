@@ -19,7 +19,7 @@ app.use(
     },
   }),
 );
-app.use(express.json({ limit: '200kb' }));
+app.use(express.json({ limit: '300kb' })); // room for a resized profile picture
 
 const generalLimiter = rateLimit({ windowMs: 60_000, limit: 300, standardHeaders: 'draft-7', legacyHeaders: false });
 const writeLimiter = rateLimit({ windowMs: 60_000, limit: 30, standardHeaders: 'draft-7', legacyHeaders: false });
@@ -36,6 +36,10 @@ app.use('/api/tutors', require('./routes/tutors'));
 app.use('/api/jobs', require('./routes/jobs'));
 app.use('/api/orders', require('./routes/orders').router);
 app.use('/api/agent', require('./routes/agent'));
+app.use(['/api/me', '/api/images'], (req, _res, next) => (req.method === 'GET' ? next() : writeLimiter(req, _res, next)));
+app.use('/api/campaigns', (req, _res, next) => (req.method === 'GET' ? next() : writeLimiter(req, _res, next)));
+app.use('/api/campaigns', require('./routes/campaigns'));
+app.use('/api', require('./routes/profiles').router);
 app.use('/api', require('./routes/misc'));
 
 app.use(notFound);

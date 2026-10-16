@@ -43,6 +43,12 @@ Student wallet ──approve + enroll(courseId)──▶ iSabi contract
 
 **Escrow for services, checked by an AI agent**: a client locks USDC for a job with written acceptance criteria; the provider delivers a link; iSabi's verifier agent (an Arc Agent Stack wallet + Claude) checks each criterion, writes a report and signs release or reject on-chain. The client can approve directly, missed deadlines refund the client, unreviewed deliveries can be claimed, and disputes go to a human arbiter. See [agent/README.md](agent/README.md).
 
+**Accounts with email or wallet**: sign in with a 6-digit email code or Sign-In with Ethereum, and link both to one account. Browsing, profiles and campaigns work with email alone; paying always uses a wallet.
+
+**Profiles**: profile pictures (resized in the browser), bio and social handles (X, Telegram, Discord, GitHub, LinkedIn, website), shown next to tutors, escrow parties and campaign listings.
+
+**Campaigns**: projects list airdrops, testnets, quests and incentive programmes with a reward, cost, dates and a step-by-step guide with links. Listings go live after an admin approves them.
+
 **Web3 jobs board**: anyone signed in with a wallet can post roles, contracts and bounties (with USDC pay ranges); learners browse, filter and apply, and each job links to related iSabi courses.
 
 **Platform**: fee capped at 20% in the contract, pause switch for emergencies, tutor and course moderation, two-step ownership transfer.

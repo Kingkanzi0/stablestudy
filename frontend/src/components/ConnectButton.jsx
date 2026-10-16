@@ -11,7 +11,7 @@ export default function ConnectButton() {
   const { connectors, connectAsync, isPending } = useConnect()
   const { disconnect } = useDisconnect()
   const { switchChainAsync } = useSwitchChain()
-  const { signOut } = useAuth()
+  const { signOut, user } = useAuth()
   const toast = useToast()
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
@@ -113,7 +113,8 @@ export default function ConnectButton() {
           <button
             className="menu-item"
             onClick={() => {
-              signOut()
+              // Email accounts stay signed in without a wallet; wallet-only accounts sign out.
+              if (!user?.email) signOut()
               disconnect()
               setOpen(false)
             }}

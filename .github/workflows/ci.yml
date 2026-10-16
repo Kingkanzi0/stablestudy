@@ -97,7 +97,7 @@ jobs:
         run: |
           npm install
           npx prisma migrate deploy
-          SKILLPAY_ADDRESS=$SKILLPAY ESCROW_ADDRESS=$ESCROW node src/index.js > api.log 2>&1 &
+          SKILLPAY_ADDRESS=$SKILLPAY ESCROW_ADDRESS=$ESCROW ADMIN_WALLETS=$CLIENT_ADDR node src/index.js > api.log 2>&1 &
           for i in $(seq 1 30); do curl -fsS localhost:5001/api/health && break; sleep 1; done
           curl -fsS localhost:5001/api/health | grep -q '"escrow":"0x'
       - name: Run the escrow flow end to end
