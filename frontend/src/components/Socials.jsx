@@ -1,3 +1,5 @@
+import { SOCIAL_FIELDS } from '../lib/socials'
+
 const ICONS = {
   x: 'M17.8 3h3.1l-6.8 7.8 8 10.2h-6.3l-4.9-6.4L5.3 21H2.2l7.3-8.3L1.8 3h6.4l4.4 5.9L17.8 3Zm-1.1 16.2h1.7L7.4 4.7H5.6l11.1 14.5Z',
   telegram: 'M21.5 4.3 2.9 11.5c-1.3.5-1.2 2.3.1 2.7l4.7 1.5 1.8 5.6c.3.9 1.5 1.2 2.2.5l2.6-2.5 4.9 3.6c.8.6 2 .1 2.2-.9l3.2-15.4c.3-1.3-1-2.4-2.3-1.9Zm-3.4 4.1-8 7.3-.3 3.1-1.4-4.5 9.4-6.1c.4-.3.7.1.3.2Z',
@@ -7,14 +9,6 @@ const ICONS = {
   website: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.9 6h-2.9a15.6 15.6 0 0 0-1.4-3.6A8 8 0 0 1 18.9 8ZM12 4c.8 1.2 1.5 2.5 1.9 4h-3.8c.4-1.5 1.1-2.8 1.9-4ZM4.3 14a8.2 8.2 0 0 1 0-4h3.3a16.5 16.5 0 0 0 0 4H4.3Zm.8 2h2.9c.3 1.3.8 2.5 1.4 3.6A8 8 0 0 1 5.1 16ZM8 8H5.1a8 8 0 0 1 4.3-3.6C8.8 5.5 8.3 6.7 8 8Zm4 12c-.8-1.2-1.5-2.5-1.9-4h3.8c-.4 1.5-1.1 2.8-1.9 4Zm2.3-6H9.7a14.7 14.7 0 0 1 0-4h4.6a14.7 14.7 0 0 1 0 4Zm.3 5.6c.6-1.1 1.1-2.3 1.4-3.6h2.9a8 8 0 0 1-4.3 3.6Zm1.8-5.6a16.5 16.5 0 0 0 0-4h3.3a8.2 8.2 0 0 1 0 4h-3.3Z',
 }
 
-export const SOCIAL_FIELDS = [
-  { key: 'x', label: 'X (Twitter)', placeholder: 'handle', prefix: '@' },
-  { key: 'telegram', label: 'Telegram', placeholder: 'username', prefix: '@' },
-  { key: 'discord', label: 'Discord', placeholder: 'username' },
-  { key: 'github', label: 'GitHub', placeholder: 'username' },
-  { key: 'linkedin', label: 'LinkedIn', placeholder: 'https://linkedin.com/in/…' },
-  { key: 'website', label: 'Website', placeholder: 'https://…' },
-]
 
 function href(key, value) {
   if (key === 'x') return `https://x.com/${value}`
