@@ -171,3 +171,82 @@ const q = await call('/agent/queue', { token: env.AGENT_API_KEY })
 assert.equal(q.items.length, 0)
 
 console.log('\n✅ Escrow end-to-end test passed')
+
+// ───────────────────────────── Accounts, profiles and campaigns ─────────────────────────────
+step('sign up with an email code')
+const email = `e2e-${Date.now()}@example.com`
+const started = await call('/auth/email/start', { method: 'POST', body: { email } })
+assert.ok(started.devCode, 'without an email service the API returns the code in development')
+await assert.rejects(call('/auth/email/verify', { method: 'POST', body: { email, code: started.devCode === '000000' ? '111111' : '000000' } }))
+const emailSession = await call('/auth/email/verify', { method: 'POST', body: { email, code: started.devCode } })
+assert.equal(emailSession.user.email, email)
+assert.equal(emailSession.user.wallet, null)
+let me = (await call('/me', { token: emailSession.token })).profile
+assert.equal(me.email, email)
+assert.equal((await fetch(`${API}/orders/mine`, { headers: { Authorization: `Bearer ${emailSession.token}` } })).status, 401, 'wallet-only routes need a wallet')
+
+step('profile: name, socials and a picture')
+me = (await call('/me', { method: 'PUT', token: emailSession.token, body: { displayName: 'Ada E2E', bio: 'Testing iSabi', socials: { x: '@ada', github: 'ada', website: 'https://example.com' } } })).profile
+assert.equal(me.displayName, 'Ada E2E')
+assert.equal(me.socials.x, 'ada')
+const png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+me = (await call('/me/avatar', { method: 'POST', token: emailSession.token, body: { image: png } })).profile
+assert.ok(me.avatarUrl)
+const imgRes = await fetch(me.avatarUrl.replace(/^.*\/api/, API))
+assert.equal(imgRes.status, 200)
+assert.equal(imgRes.headers.get('content-type'), 'image/png')
+await assert.rejects(call('/me/avatar', { method: 'POST', token: emailSession.token, body: { image: 'data:image/png;base64,aGVsbG8=' } }))
+
+step('link a wallet to the email account')
+{
+  const account = privateKeyToAccount(env.PROVIDER_PK)
+  const { nonce } = await call('/auth/nonce')
+  const message = createSiweMessage({ domain: 'localhost:5173', address: account.address, statement: 'Sign in to iSabi.', uri: 'http://localhost:5173', version: '1', chainId: chain.id, nonce, issuedAt: new Date() })
+  const signature = await account.signMessage({ message })
+  const linked = await call('/auth/verify', { method: 'POST', token: emailSession.token, body: { message, signature } })
+  assert.equal(linked.user.email, email)
+  assert.equal(linked.user.wallet, account.address.toLowerCase())
+  const pub = (await call(`/profiles/${account.address}`)).profile
+  assert.equal(pub.displayName, 'Ada E2E')
+  assert.equal(pub.email, undefined, 'public profiles never show emails')
+  // The linked session can use wallet routes now
+  await call('/orders/mine', { token: linked.token })
+}
+
+step('campaigns: submit, admin approves, it goes live')
+const campaignBody = {
+  projectName: 'Example Protocol',
+  title: 'Testnet quest season 1',
+  summary: 'Try the testnet, earn points toward the season 1 airdrop.',
+  description: 'Use the app on Arc Testnet: swap, provide liquidity and report bugs to earn points.',
+  type: 'TESTNET',
+  reward: 'Points + possible airdrop',
+  cost: 'FREE',
+  chain: 'Arc',
+  endsAt: new Date(Date.now() + 7 * 86400_000).toISOString(),
+  websiteUrl: 'https://example.com',
+  steps: [{ title: 'Get test USDC', details: 'Use the Circle faucet.', url: 'https://faucet.circle.com' }, { title: 'Make a swap' }],
+  tags: ['testnet'],
+}
+const { campaign } = await call('/campaigns', { method: 'POST', token: emailSession.token, body: campaignBody })
+assert.equal(campaign.status, 'PENDING')
+assert.ok(!(await call('/campaigns')).campaigns.some((c) => c.id === campaign.id), 'pending campaigns are hidden')
+assert.equal((await fetch(`${API}/campaigns/${campaign.id}`)).status, 404)
+await assert.rejects(call(`/campaigns/${campaign.id}/review`, { method: 'POST', token: emailSession.token, body: { approve: true } }), /403/)
+const queue = await call('/campaigns/review', { token: client.token })
+assert.ok(queue.campaigns.some((c) => c.id === campaign.id))
+await call(`/campaigns/${campaign.id}/review`, { method: 'POST', token: client.token, body: { approve: true, featured: true } })
+const live = await call('/campaigns?phase=LIVE')
+assert.ok(live.campaigns.some((c) => c.id === campaign.id && c.featured))
+const shown = (await call(`/campaigns/${campaign.id}`)).campaign
+assert.equal(shown.steps.length, 2)
+assert.equal(shown.postedBy.displayName, 'Ada E2E')
+{
+  const stranger = `e2e-other-${Date.now()}@example.com`
+  const { devCode } = await call('/auth/email/start', { method: 'POST', body: { email: stranger } })
+  const other = await call('/auth/email/verify', { method: 'POST', body: { email: stranger, code: devCode } })
+  await assert.rejects(call(`/campaigns/${campaign.id}`, { method: 'PUT', token: other.token, body: campaignBody }), /404/, 'only the owner can edit')
+  await assert.rejects(call('/auth/email/start', { method: 'POST', body: { email: stranger } }), /429/, 'codes are rate limited')
+}
+
+console.log('\n✅ Accounts, profiles and campaigns test passed')

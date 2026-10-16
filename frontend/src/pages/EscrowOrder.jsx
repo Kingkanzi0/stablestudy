@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useReadContract } from 'wagmi'
 import { useQueryClient } from '@tanstack/react-query'
-import { ErrorState, Field, SignInGate, Spinner, TxLink } from '../components/common'
+import { Avatar, ErrorState, Field, SignInGate, Spinner, TxLink } from '../components/common'
+import { useProfile } from '../hooks/useProfile'
 import { useApi } from '../hooks/useApi'
 import { useAuth } from '../hooks/useAuth'
 import { useChainTx } from '../hooks/useChainTx'
@@ -210,14 +211,22 @@ function Order() {
   )
 }
 
+/** Wallet with the person's picture and name when they have an iSabi profile. */
 function AddressLink({ address }) {
+  const profile = useProfile(address)
   const href = explorerAddress(address)
-  return href ? (
-    <a href={href} target="_blank" rel="noreferrer">
-      {shortAddress(address)}
-    </a>
-  ) : (
-    shortAddress(address)
+  const label = profile?.displayName || shortAddress(address)
+  return (
+    <span className="person-link">
+      {profile && (profile.avatarUrl || profile.displayName) && <Avatar person={{ ...profile, address }} size={22} />}
+      {href ? (
+        <a href={href} target="_blank" rel="noreferrer" title={address}>
+          {label}
+        </a>
+      ) : (
+        label
+      )}
+    </span>
   )
 }
 

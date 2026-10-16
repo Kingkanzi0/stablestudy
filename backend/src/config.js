@@ -50,6 +50,14 @@ const schema = z.object({
     .min(24, 'AGENT_API_KEY must be at least 24 characters')
     .optional()
     .or(z.literal('').transform(() => undefined)),
+  // Email sign-in codes. Brevo works with a verified single sender address (e.g. a Gmail address);
+  // Resend needs a domain you own. With neither set, email sign-in is switched off in production.
+  BREVO_API_KEY: z.string().optional().or(z.literal('').transform(() => undefined)),
+  RESEND_API_KEY: z.string().optional().or(z.literal('').transform(() => undefined)),
+  EMAIL_FROM: z.string().optional().or(z.literal('').transform(() => undefined)),
+  // Comma-separated wallets and emails that can approve campaigns
+  ADMIN_WALLETS: z.string().default(''),
+  ADMIN_EMAILS: z.string().default(''),
 });
 
 const parsed = schema.safeParse(process.env);
@@ -72,4 +80,7 @@ module.exports = {
   contractAddress: env.SKILLPAY_ADDRESS.toLowerCase(),
   escrowAddress: env.ESCROW_ADDRESS ? env.ESCROW_ADDRESS.toLowerCase() : null,
   USDC_DECIMALS: 6,
+  publicApiUrl: env.PUBLIC_API_URL.replace(/\/$/, ''),
+  adminWallets: new Set(env.ADMIN_WALLETS.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean)),
+  adminEmails: new Set(env.ADMIN_EMAILS.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean)),
 };

@@ -15,6 +15,12 @@ import MyJobs from './pages/MyJobs'
 import EscrowList from './pages/EscrowList'
 import EscrowNew from './pages/EscrowNew'
 import EscrowOrder from './pages/EscrowOrder'
+import SignIn from './pages/SignIn'
+import Profile from './pages/Profile'
+import Campaigns from './pages/Campaigns'
+import CampaignDetail from './pages/CampaignDetail'
+import CampaignEditor from './pages/CampaignEditor'
+import AdminCampaigns from './pages/AdminCampaigns'
 
 export default function App() {
   return (
@@ -37,6 +43,13 @@ export default function App() {
         <Route path="escrow" element={<EscrowList />} />
         <Route path="escrow/new" element={<EscrowNew />} />
         <Route path="escrow/:id" element={<EscrowOrder />} />
+        <Route path="signin" element={<SignIn />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="campaigns" element={<Campaigns />} />
+        <Route path="campaigns/new" element={<CampaignEditor />} />
+        <Route path="campaigns/:id" element={<CampaignDetail />} />
+        <Route path="campaigns/:id/edit" element={<CampaignEditor />} />
+        <Route path="admin/campaigns" element={<AdminCampaigns />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

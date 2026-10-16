@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useAccount } from 'wagmi'
 import { useAuth } from '../hooks/useAuth'
 import { useToast } from '../hooks/useToast'
@@ -65,13 +65,14 @@ export function CourseCard({ course }) {
   )
 }
 
-export function Avatar({ tutor, size = 40 }) {
-  const name = tutor?.displayName || tutor?.address || '?'
+export function Avatar({ tutor: tutorProp, person, size = 40 }) {
+  const tutor = person || tutorProp
+  const name = tutor?.displayName || tutor?.address || tutor?.email || '?'
   if (tutor?.avatarUrl) {
     return <img className="avatar" src={tutor.avatarUrl} alt="" width={size} height={size} style={{ width: size, height: size }} />
   }
   // Deterministic colour from the address so each tutor is recognisable.
-  const seed = parseInt((tutor?.address || '0x0').slice(2, 8), 16) || 0
+  const seed = parseInt((tutor?.address || tutor?.id || '0x0').replace(/[^0-9a-f]/gi, '').slice(0, 6), 16) || 0
   const hue = seed % 360
   return (
     <span
@@ -126,36 +127,66 @@ export function TxLink({ hash, children }) {
   )
 }
 
-/** Renders children once the wallet is connected and signed in; otherwise prompts for each step. */
+/**
+ * For on-chain actions: needs the connected wallet to be signed in (and on the account).
+ * Email-only accounts are asked to connect and link a wallet.
+ */
 export function SignInGate({ children, why = 'to continue' }) {
   const { isConnected } = useAccount()
-  const { isSignedIn, signIn, signingIn } = useAuth()
+  const { isSignedIn, walletReady, user, signIn, signingIn } = useAuth()
   const toast = useToast()
+
+  if (walletReady) return children
+  const linking = isSignedIn && user?.email && !user?.wallet
 
   if (!isConnected) {
     return (
       <div className="gate">
-        <h2>Connect your wallet</h2>
-        <p>Connect a wallet {why}. Use the button at the top of the page.</p>
+        <h2>{linking ? 'Add a wallet to your account' : 'Connect your wallet'}</h2>
+        <p>
+          {linking
+            ? `Payments on iSabi happen on Arc, so you need a wallet ${why}. Connect one with the button at the top; it will be linked to ${user.email}.`
+            : `Connect a wallet ${why}. Use the button at the top of the page.`}
+        </p>
       </div>
     )
   }
-  if (!isSignedIn) {
-    return (
-      <div className="gate">
-        <h2>Sign in with your wallet</h2>
-        <p>Signing a message proves this wallet is yours. It’s free and doesn’t send a transaction.</p>
-        <button
-          className="btn btn-primary"
-          disabled={signingIn}
-          onClick={() => signIn().catch((e) => toast.error('Sign-in failed', { body: friendlyError(e) }))}
-        >
-          {signingIn ? 'Check your wallet…' : 'Sign in'}
-        </button>
-      </div>
-    )
-  }
-  return children
+  const otherWallet = isSignedIn && user?.wallet && !linking
+  return (
+    <div className="gate">
+      <h2>{linking ? 'Link this wallet' : otherWallet ? 'Sign in with this wallet' : 'Sign in with your wallet'}</h2>
+      <p>
+        {linking
+          ? `Sign a message to prove this wallet is yours and add it to ${user.email}. It’s free and doesn’t send a transaction.`
+          : otherWallet
+            ? 'Your account uses a different wallet. Switch back to it in your wallet app, or sign in with this one.'
+            : 'Signing a message proves this wallet is yours. It’s free and doesn’t send a transaction.'}
+      </p>
+      <button
+        className="btn btn-primary"
+        disabled={signingIn}
+        onClick={() => signIn().catch((e) => toast.error('Sign-in failed', { body: friendlyError(e) }))}
+      >
+        {signingIn ? 'Check your wallet…' : linking ? 'Link wallet' : 'Sign in'}
+      </button>
+    </div>
+  )
+}
+
+/** For things that only need an account (profile, campaigns): email or wallet. */
+export function AccountGate({ children, why = 'to continue' }) {
+  const { isSignedIn } = useAuth()
+  const location = useLocation()
+  if (isSignedIn) return children
+  return (
+    <div className="gate">
+      <h2>Sign in {why}</h2>
+      <p>Use your email or a wallet. It takes a few seconds.</p>
+      <Link className="btn btn-primary" to={`/signin?next=${encodeURIComponent(location.pathname)}`}>
+        Sign in
+      </Link>
+    </div>
+  )
 }
 
 export function Field({ label, hint, error, children }) {
